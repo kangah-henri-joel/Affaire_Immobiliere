@@ -1,0 +1,18 @@
+# Git ignore file
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Application specific
+scratch/
+assets/uploads/*
+!assets/uploads/.gitkeep
+
+# IDE specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
