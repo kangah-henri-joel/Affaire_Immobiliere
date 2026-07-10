@@ -19,11 +19,10 @@ Projet_Affaire est une application web complète de gestion immobilière et d'au
 
 ### Étapes
 1. **Clonage / Copie** : Placez le dossier du projet dans `C:\xampp\htdocs\Projet_Affaire`.
-2. **Base de Données** :
+2. **Base de Données** (une seule base : `immo_affaire_db`) :
    - Lancez MySQL via XAMPP.
    - Accédez à [phpMyAdmin](http://localhost/phpmyadmin).
-   - Créez une base de données nommée `immo_affaire_db`.
-   - Importez le fichier `schema.sql` fourni à la racine.
+   - Importez le fichier `schema.sql` à la racine (schéma complet, toutes les tables et données initiales).
 3. **Configuration** :
    - Vérifiez les paramètres de connexion dans `config/database.php`.
 4. **Lancement** :
@@ -32,14 +31,9 @@ Projet_Affaire est une application web complète de gestion immobilière et d'au
 ## 🔐 Accès Administration
 
 - **URL** : `http://localhost/Projet_Affaire/login`
-- **Compte par défaut** (à créer via SQL si absent) :
-  - **Login** : `admin`
-  - **Password** : `admin123`
-
-```sql
-INSERT INTO users (username, password, full_name, role) 
-VALUES ('admin', '$2y$10$w8.3f6yG0Y7x.y.u9.3r.Oe5gW.Q7zK9gG4g5g6g7g8g9g0g1g2g3', 'Administrateur', 'admin');
-```
+- **Comptes par défaut** (créés automatiquement par `schema.sql`) :
+  - Admin : `admin` / `admin123`
+  - Super Admin : `superadmin` / `admin123`
 
 ## 📂 Structure du Projet
 
@@ -49,7 +43,7 @@ VALUES ('admin', '$2y$10$w8.3f6yG0Y7x.y.u9.3r.Oe5gW.Q7zK9gG4g5g6g7g8g9g0g1g2g3',
 - `controllers/` : Logique de l'application (MVC).
 - `models/` : Interaction avec la base de données (MVC).
 - `views/` : Fichiers d'interface utilisateur (MVC).
-- `schema.sql` : Script de création de la base de données.
+- `schema.sql` : Schéma complet unique (16 tables, base `immo_affaire_db`).
 - `index.php` : Point d'entrée unique de l'application.
 
 ## 🛡️ Sécurité
