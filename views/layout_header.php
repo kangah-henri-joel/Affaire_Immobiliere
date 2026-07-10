@@ -9,7 +9,7 @@ $companyName = $siteSettings['company_name'] ?? 'ImmoAffaire';
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="<?php echo $companyName; ?> - Votre partenaire immobilier de confiance en Côte d'Ivoire.">
     <title><?php echo $title ?? $companyName; ?></title>
     
