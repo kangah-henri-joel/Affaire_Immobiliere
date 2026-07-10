@@ -1,18 +1,7 @@
 <?php include __DIR__ . '/../layout_header.php'; ?>
 
 <div class="admin-container">
-    <aside class="admin-sidebar">
-        <ul>
-            <li><a href="<?php echo BASE_URL; ?>/admin"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/annonces"><i class="fas fa-home"></i> Annonces</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/publications" class="active"><i class="fas fa-bullhorn"></i> Publications</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/leads"><i class="fas fa-envelope"></i> Leads</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/consultants"><i class="fas fa-users"></i> Consultants</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/settings"><i class="fas fa-cogs"></i> Entreprise</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/profil"><i class="fas fa-user-circle"></i> Profil</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
-        </ul>
-    </aside>
+    <?php include __DIR__ . '/sidebar.php'; ?>
     
     <main class="admin-content">
         <header class="admin-header">
@@ -79,17 +68,48 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <div style="display: flex; gap: 5px;">
+                                        <div style="display: flex; gap: 5px; flex-wrap:wrap;">
+                                            <?php
+                                                require_once __DIR__ . '/../../config/SiteUrl.php';
+                                                $annUrl  = SiteUrl::annonce($p['annonce_id']);
+                                                $imgUrl  = SiteUrl::media($p['image_path'] ?? null);
+
+                                                // Message texte complet
+                                                $richMsg = "\u{1F3E0} *" . $p['annonce_title'] . "*\n"
+                                                         . "\u{1F4B0} Prix : " . number_format($p['annonce_price'] ?? 0, 0, ',', ' ') . " FCFA\n"
+                                                         . "\u{1F4CD} " . ($p['location_name'] ?? '') . "\n"
+                                                         . "\u{1F5C2} " . ($p['category_name'] ?? '') . ' — ' . ucfirst($p['annonce_type'] ?? '') . "\n\n"
+                                                         . ($p['generated_text'] ?? '') . "\n\n"
+                                                         . "\u{1F449} Voir le bien : " . $annUrl;
+                                            ?>
+
                                             <?php if($p['platform'] == 'whatsapp'): ?>
-                                                <a href="https://api.whatsapp.com/send?text=<?php echo urlencode($p['generated_text']); ?>" target="_blank" class="btn-sm" style="color: #25d366;" title="Publier sur WhatsApp">
-                                                    <i class="fab fa-whatsapp"></i>
+                                                <a href="https://api.whatsapp.com/send?text=<?php echo rawurlencode($richMsg); ?>"
+                                                   target="_blank" class="btn-share btn-share-wa" title="Publier sur WhatsApp">
+                                                    <i class="fab fa-whatsapp"></i> Publier
                                                 </a>
+
                                             <?php elseif($p['platform'] == 'facebook'): ?>
-                                                <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(BASE_URL . '/annonce/' . $p['annonce_id']); ?>&quote=<?php echo urlencode($p['generated_text']); ?>" target="_blank" class="btn-sm" style="color: #1877f2;" title="Partager sur Facebook">
-                                                    <i class="fab fa-facebook"></i>
+                                                <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo rawurlencode($annUrl); ?>&quote=<?php echo rawurlencode(($p['generated_text'] ?? '') . "\n\n\u{1F449} " . $annUrl); ?>"
+                                                   target="_blank" class="btn-share btn-share-fb" title="Partager sur Facebook">
+                                                    <i class="fab fa-facebook"></i> Partager
                                                 </a>
+
+                                            <?php elseif($p['platform'] == 'tiktok'): ?>
+                                                <button class="btn-share btn-share-tt"
+                                                        onclick="publishToTikTok(this, `<?php echo addslashes(str_replace(['`','\\'], ['\\`','\\\\'], $richMsg)); ?>`)"
+                                                        title="Copier le texte et ouvrir TikTok">
+                                                    <i class="fab fa-tiktok"></i> Publier
+                                                </button>
                                             <?php endif; ?>
-                                            
+
+                                            <!-- Copier le texte -->
+                                            <button class="btn-share btn-share-copy"
+                                                    onclick="copyToClipboard(this, `<?php echo addslashes(str_replace(['`','\\'], ['\\`','\\\\'], $richMsg)); ?>`)"
+                                                    title="Copier le texte">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+
                                             <button class="btn-sm" onclick="editPublication(<?php echo $p['id']; ?>)"><i class="fas fa-edit"></i></button>
                                             <a href="<?php echo BASE_URL; ?>/admin/publications/delete?id=<?php echo $p['id']; ?>" class="btn-sm" style="color: var(--danger);" onclick="return confirm('Supprimer cette publication ?')">
                                                 <i class="fas fa-trash"></i>
@@ -108,12 +128,29 @@
     </main>
 </div>
 
+<!-- Toast notification TikTok -->
+<div id="tiktokToast" style="
+    display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+    background:#0f172a; color:white; padding:16px 28px; border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:9999; font-size:0.92rem;
+    align-items:center; gap:12px; max-width:420px; text-align:center;
+    border:1.5px solid rgba(255,255,255,0.1);
+">
+    <i class="fab fa-tiktok" style="font-size:1.5rem; color:#fe2c55;"></i>
+    <div>
+        <strong style="display:block;margin-bottom:3px;">Texte copié !</strong>
+        <span style="color:rgba(255,255,255,0.7);font-size:0.82rem;">
+            TikTok s'ouvre… Collez le texte dans votre description de vidéo.
+        </span>
+    </div>
+</div>
+
 <!-- Modal Publication (Unique pour Ajout/Edit) -->
 <div id="publishModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="toggleModal('publishModal')">&times;</span>
         <h2 id="modalTitle">Programmer une <span class="highlight">Publication</span></h2>
-        <form action="<?php echo BASE_URL; ?>/admin/publications/save" method="POST" id="publishForm">
+        <form action="<?php echo BASE_URL; ?>/admin/publications/save" method="POST" id="publishForm" onsubmit="return validatePlatforms()">
             <input type="hidden" name="id" id="pubId">
             
             <div class="form-group" id="annonceSelectGroup">
@@ -125,15 +162,31 @@
                 </select>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
-                <div class="form-group">
-                    <label>Plateforme</label>
-                    <select name="platform" id="pubPlatform" required>
-                        <option value="facebook">Facebook</option>
-                        <option value="whatsapp">WhatsApp</option>
-                        <option value="tiktok">TikTok</option>
-                    </select>
+            <!-- Sélection des plateformes par checkboxes -->
+            <div class="form-group" id="platformsGroup">
+                <label style="display:block;margin-bottom:10px;font-weight:700;">Plateformes <span style="color:var(--danger);font-size:0.8rem;">(sélectionnez au moins une)</span></label>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                    <label class="platform-checkbox-label" id="lbl-facebook">
+                        <input type="checkbox" name="platforms[]" value="facebook" id="chk-facebook" class="platform-chk" onchange="syncSinglePlatform()">
+                        <i class="fab fa-facebook" style="color:#1877f2;font-size:1.4rem;"></i>
+                        <span>Facebook</span>
+                    </label>
+                    <label class="platform-checkbox-label" id="lbl-whatsapp">
+                        <input type="checkbox" name="platforms[]" value="whatsapp" id="chk-whatsapp" class="platform-chk" onchange="syncSinglePlatform()">
+                        <i class="fab fa-whatsapp" style="color:#25d366;font-size:1.4rem;"></i>
+                        <span>WhatsApp</span>
+                    </label>
+                    <label class="platform-checkbox-label" id="lbl-tiktok">
+                        <input type="checkbox" name="platforms[]" value="tiktok" id="chk-tiktok" class="platform-chk" onchange="syncSinglePlatform()">
+                        <i class="fab fa-tiktok" style="color:#000;font-size:1.4rem;"></i>
+                        <span>TikTok</span>
+                    </label>
                 </div>
+                <!-- Champ caché pour l'édition d'une publication existante (1 seule plateforme) -->
+                <input type="hidden" name="platform" id="pubPlatform">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label>Date et Heure</label>
                     <input type="datetime-local" name="scheduled_at" id="pubDate" required>
@@ -154,7 +207,41 @@
     </div>
 </div>
 
+<style>
+.platform-checkbox-label {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border: 2px solid #e2e8f0; border-radius: 10px;
+    cursor: pointer; transition: all 0.2s; user-select: none; background: #f8fafc;
+    font-weight: 600; font-size: 0.9rem;
+}
+.platform-checkbox-label input[type="checkbox"] { display: none; }
+.platform-checkbox-label.checked { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
+.platform-checkbox-label.checked i { filter: drop-shadow(0 0 4px currentColor); }
+</style>
+
 <script>
+// Toggle visuel des checkboxes plateforme
+document.querySelectorAll('.platform-chk').forEach(chk => {
+    chk.addEventListener('change', () => {
+        chk.closest('.platform-checkbox-label').classList.toggle('checked', chk.checked);
+    });
+});
+
+function syncSinglePlatform() {
+    // rien de spécial ici, géré par la boucle ci-dessus
+}
+
+function validatePlatforms() {
+    const isEdit = document.getElementById('pubId').value !== '';
+    if (isEdit) return true; // en édition, la plateforme est dans le champ hidden
+    const checked = document.querySelectorAll('.platform-chk:checked');
+    if (checked.length === 0) {
+        alert('Veuillez sélectionner au moins une plateforme.');
+        return false;
+    }
+    return true;
+}
+
 function toggleModal(id) {
     const modal = document.getElementById(id);
     modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
@@ -165,6 +252,11 @@ function openAddModal() {
     document.getElementById('pubId').value = '';
     document.getElementById('publishForm').reset();
     document.getElementById('annonceSelectGroup').style.display = 'block';
+    document.getElementById('platformsGroup').style.display = 'block';
+    // Réinitialiser les checkboxes visuellement
+    document.querySelectorAll('.platform-checkbox-label').forEach(l => l.classList.remove('checked'));
+    document.querySelectorAll('.platform-chk').forEach(c => c.checked = false);
+    document.getElementById('pubPlatform').value = '';
     document.getElementById('btnSubmit').innerText = 'Valider la programmation';
     toggleModal('publishModal');
 }
@@ -176,7 +268,10 @@ async function editPublication(id) {
         
         document.getElementById('modalTitle').innerHTML = 'Modifier la <span class="highlight">Publication</span>';
         document.getElementById('pubId').value = data.id;
+
+        // En mode édition, on utilise le champ hidden platform et on cache les checkboxes
         document.getElementById('pubPlatform').value = data.platform;
+        document.getElementById('platformsGroup').style.display = 'none';
         
         // Format date for input datetime-local
         const date = new Date(data.scheduled_at);
@@ -186,7 +281,6 @@ async function editPublication(id) {
         document.getElementById('pubText').value = data.generated_text;
         document.getElementById('pubRepeat').value = data.repeat_days || 0;
         
-        // Hide annonce select on edit to avoid complexity, but keep value
         document.getElementById('pubAnnonceId').value = data.annonce_id;
         document.getElementById('annonceSelectGroup').style.display = 'none';
         
@@ -195,6 +289,40 @@ async function editPublication(id) {
     } catch (error) {
         alert('Erreur lors du chargement des données');
     }
+}
+
+function copyToClipboard(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => btn.innerHTML = orig, 2000);
+    });
+}
+
+function publishToTikTok(btn, text) {
+    // 1. Copier le texte
+    navigator.clipboard.writeText(text).then(() => {
+        // 2. Afficher le toast
+        const toast = document.getElementById('tiktokToast');
+        toast.style.display = 'flex';
+
+        // 3. Ouvrir TikTok après un court délai
+        setTimeout(() => {
+            window.open('https://www.tiktok.com/upload', '_blank');
+        }, 600);
+
+        // 4. Masquer le toast après 5s
+        setTimeout(() => { toast.style.display = 'none'; }, 5000);
+
+        // 5. Feedback visuel sur le bouton
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+        setTimeout(() => btn.innerHTML = orig, 3000);
+    }).catch(() => {
+        // Fallback si clipboard API non disponible
+        window.open('https://www.tiktok.com/upload', '_blank');
+        alert('Veuillez copier manuellement le texte de l\'annonce pour le coller sur TikTok.');
+    });
 }
 </script>
 

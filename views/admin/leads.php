@@ -1,18 +1,7 @@
 <?php include __DIR__ . '/../layout_header.php'; ?>
 
 <div class="admin-container">
-    <aside class="admin-sidebar">
-        <ul>
-            <li><a href="<?php echo BASE_URL; ?>/admin"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/annonces"><i class="fas fa-home"></i> Annonces</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/publications"><i class="fas fa-bullhorn"></i> Publications</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/leads" class="active"><i class="fas fa-envelope"></i> Leads</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/consultants"><i class="fas fa-users"></i> Consultants</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/settings"><i class="fas fa-cogs"></i> Entreprise</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/profil"><i class="fas fa-user-circle"></i> Profil</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
-        </ul>
-    </aside>
+    <?php include __DIR__ . '/sidebar.php'; ?>
     
     <main class="admin-content">
         <header class="admin-header">

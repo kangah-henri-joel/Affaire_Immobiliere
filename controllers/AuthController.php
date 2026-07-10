@@ -13,9 +13,17 @@ class AuthController extends Controller {
             $user = $userModel->getByUsername($username);
 
             if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $this->redirect('/admin');
+                $_SESSION['user_id']   = $user['id'];
+                $_SESSION['username']  = $user['username'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['full_name'] = $user['full_name'];
+
+                // Redirection selon le rôle
+                if ($user['role'] === 'super_admin') {
+                    $this->redirect('/super-admin');
+                } else {
+                    $this->redirect('/admin');
+                }
             } else {
                 $error = "Identifiants invalides.";
                 $this->render('login', ['error' => $error]);

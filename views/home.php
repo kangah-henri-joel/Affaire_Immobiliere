@@ -6,23 +6,25 @@
             <h1>L'immobilier d'exception en <span class="highlight">Côte d'Ivoire</span></h1>
             <p>Découvrez une sélection exclusive de terrains, villas et véhicules de prestige. Simple, rapide et sécurisé.</p>
             
-            <div class="search-container-glass">
-                <form action="<?php echo BASE_URL; ?>/annonces" method="GET" class="search-form-pro">
-                    <div class="search-group">
-                        <i class="fas fa-th-large"></i>
-                        <select name="category">
-                            <option value="">Toutes catégories</option>
-                            <option value="terrain">Terrains</option>
-                            <option value="maison">Maisons</option>
-                            <option value="vehicule">Véhicules</option>
-                        </select>
-                    </div>
-                    <div class="search-group flex-grow">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="query" placeholder="Ville, quartier ou mot-clé...">
-                    </div>
-                    <button type="submit" class="btn-search-pro">Rechercher</button>
-                </form>
+            <div class="search-wrapper">
+                <div class="search-container-glass">
+                    <form action="<?php echo BASE_URL; ?>/annonces" method="GET" class="search-form-pro">
+                        <div class="search-group">
+                            <i class="fas fa-th-large"></i>
+                            <select name="category">
+                                <option value="">Toutes catégories</option>
+                                <option value="terrain">Terrains</option>
+                                <option value="maison">Maisons</option>
+                                <option value="vehicule">Véhicules</option>
+                            </select>
+                        </div>
+                        <div class="search-group flex-grow">
+                            <i class="fas fa-search"></i>
+                            <input type="text" name="query" placeholder="Ville, quartier ou mot-clé...">
+                        </div>
+                        <button type="submit" class="btn-search-pro">Rechercher</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -60,10 +62,56 @@
             <a href="<?php echo BASE_URL; ?>/annonces" class="btn-outline-pro">Voir tout</a>
         </div>
 
-        <div class="annonce-grid">
+        <!-- Système de filtres 2 niveaux -->
+        <div class="smart-filter-wrap">
+            <!-- Niveau 1 : Type -->
+            <div class="smart-filter-row">
+                <span class="filter-label">Type :</span>
+                <div class="smart-filter-group" id="typeFilterHome">
+                    <button class="smart-btn type-btn active" data-type="all" onclick="applyFilter('home')">
+                        Tous
+                    </button>
+                    <button class="smart-btn type-btn type-vente" data-type="vente" onclick="applyFilter('home')">
+                        <i class="fas fa-tag"></i> Vente
+                    </button>
+                    <button class="smart-btn type-btn type-location" data-type="location" onclick="applyFilter('home')">
+                        <i class="fas fa-key"></i> Location
+                    </button>
+                </div>
+            </div>
+            <!-- Niveau 2 : Catégorie -->
+            <div class="smart-filter-row">
+                <span class="filter-label">Catégorie :</span>
+                <div class="smart-filter-group" id="catFilterHome">
+                    <button class="smart-btn cat-btn active" data-cat="all" onclick="applyFilter('home')">
+                        <i class="fas fa-th-large"></i> Tout
+                    </button>
+                    <button class="smart-btn cat-btn" data-cat="terrain" onclick="applyFilter('home')">
+                        <i class="fas fa-mountain"></i> Terrain
+                    </button>
+                    <button class="smart-btn cat-btn" data-cat="maison" onclick="applyFilter('home')">
+                        <i class="fas fa-home"></i> Maison
+                    </button>
+                    <button class="smart-btn cat-btn" data-cat="engins" onclick="applyFilter('home')">
+                        <i class="fas fa-car"></i> Engins (Voiture, Moto)
+                    </button>
+                </div>
+            </div>
+            <div class="filter-result-count" id="homeResultCount"></div>
+        </div>
+
+        <div class="annonce-grid" id="homeAnnonceGrid">
             <?php if (!empty($annonces)): ?>
                 <?php foreach ($annonces as $annonce): ?>
-                    <div class="annonce-card-pro">
+                    <div class="annonce-card-pro"
+                         data-type="<?php echo $annonce['type']; ?>"
+                         data-cat="<?php
+                            $slug = strtolower($annonce['category_name'] ?? '');
+                            if (str_contains($slug, 'terrain')) echo 'terrain';
+                            elseif (str_contains($slug, 'maison') || str_contains($slug, 'studio') || str_contains($slug, 'magasin')) echo 'maison';
+                            elseif (str_contains($slug, 'v') || str_contains($slug, 'engin')) echo 'engins';
+                            else echo strtolower($annonce['category_name']);
+                         ?>">
                         <div class="card-img-pro">
                             <?php if (($annonce['media_type'] ?? 'image') === 'video'): ?>
                                 <div class="video-preview-placeholder">
@@ -83,6 +131,41 @@
                                 <span class="status-tag"><?php echo ucfirst($annonce['type']); ?></span>
                                 <a href="<?php echo BASE_URL; ?>/annonce/<?php echo $annonce['id']; ?>" class="btn-link-pro">Détails <i class="fas fa-arrow-right"></i></a>
                             </div>
+                            <?php if (!empty($annonce['author_name']) || !empty($annonce['author_whatsapp']) || !empty($annonce['author_phone'])): ?>
+                            <div class="card-agent-strip">
+                                <div class="card-agent-identity">
+                                    <div class="card-agent-avatar"><?php echo strtoupper(substr($annonce['author_name'] ?? 'A', 0, 1)); ?></div>
+                                    <div>
+                                        <span class="card-agent-role">Agent</span>
+                                        <span class="card-agent-name"><?php echo htmlspecialchars($annonce['author_name'] ?? 'Notre équipe'); ?></span>
+                                    </div>
+                                </div>
+                                <div class="card-agent-actions">
+                                    <?php if (!empty($annonce['author_whatsapp'])): ?>
+                                    <?php
+                                        require_once __DIR__ . '/../config/SiteUrl.php';
+                                        $waNum   = preg_replace('/[^0-9]/', '', $annonce['author_whatsapp']);
+                                        $annLink = SiteUrl::annonce($annonce['id']);
+                                        $imgLink = SiteUrl::media($annonce['image_path'] ?? null);
+                                        $waMsg   = "\u{1F3E0} *" . $annonce['title'] . "*\n"
+                                                 . "\u{1F4B0} Prix : " . number_format($annonce['price'], 0, ',', ' ') . " FCFA\n"
+                                                 . "\u{1F4CD} " . ($annonce['location_name'] ?? '') . "\n\n"
+                                                 . "\u{1F449} Voir le bien : " . $annLink . "\n"
+                                                 . "\u{1F4F7} Photo : " . $imgLink . "\n\n"
+                                                 . "Bonjour, je suis intéressé par ce bien. Merci !";
+                                    ?>
+                                    <a href="https://wa.me/<?php echo $waNum; ?>?text=<?php echo rawurlencode($waMsg); ?>" class="cta-wa" target="_blank" title="WhatsApp : <?php echo htmlspecialchars($annonce['author_whatsapp']); ?>">
+                                        <i class="fab fa-whatsapp"></i> <?php echo htmlspecialchars($annonce['author_whatsapp']); ?>
+                                    </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($annonce['author_phone'])): ?>
+                                    <a href="tel:<?php echo $annonce['author_phone']; ?>" class="cta-tel" title="Appeler : <?php echo htmlspecialchars($annonce['author_phone']); ?>">
+                                        <i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($annonce['author_phone']); ?>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -98,6 +181,12 @@
 
 <style>
 /* Styles spécifiques pour l'accueil Pro */
+.search-wrapper {
+    margin: 0 auto;
+    max-width: 900px;
+    width: 100%;
+}
+
 .search-container-glass {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(20px);
@@ -106,6 +195,32 @@
     max-width: 900px;
     margin: 0 auto;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-container-glass.is-sticky {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.3);
+    padding: 12px;
+    border-radius: 24px;
+    animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translate(-50%, -20px);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
 }
 
 .search-form-pro {
@@ -196,6 +311,89 @@
 .btn-link-pro { color: var(--primary); font-weight: 700; }
 .btn-link-pro:hover { color: var(--secondary); }
 
+/* ── AGENT STRIP SUR CARTES ACCUEIL ─────── */
+.card-agent-strip {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1.5px dashed #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.card-agent-identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card-agent-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+    flex-shrink: 0;
+}
+.card-agent-role {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--secondary);
+}
+.card-agent-name {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+}
+.card-agent-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.cta-wa, .cta-tel {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+    width: 100%;
+}
+.cta-wa {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1.5px solid #bbf7d0;
+}
+.cta-wa:hover {
+    background: #25d366;
+    color: white;
+    border-color: #25d366;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(37,211,102,0.3);
+}
+.cta-tel {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1.5px solid #bfdbfe;
+}
+.cta-tel:hover {
+    background: #1d4ed8;
+    color: white;
+    border-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(29,78,216,0.3);
+}
+
 @media (max-width: 768px) {
     .features-grid { grid-template-columns: 1fr; }
     .search-form-pro { flex-direction: column; }
@@ -203,5 +401,179 @@
     .btn-search-pro { padding: 15px; width: 100%; }
 }
 </style>
+
+<style>
+/* ===== SMART FILTER 2 NIVEAUX ===== */
+.smart-filter-wrap {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 25px;
+    margin-bottom: 35px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.smart-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+.smart-filter-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.smart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    border-radius: 50px;
+    border: 2px solid var(--border);
+    background: var(--light);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.22s ease;
+}
+
+.smart-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: white;
+    transform: translateY(-1px);
+}
+
+/* Catégories actives */
+.cat-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 14px rgba(15,23,42,0.25); transform: translateY(-1px); }
+.cat-btn[data-cat="terrain"].active { background: #92400e; border-color: #92400e; box-shadow: 0 4px 14px rgba(146,64,14,0.3); }
+.cat-btn[data-cat="maison"].active  { background: var(--accent); border-color: var(--accent); box-shadow: 0 4px 14px rgba(99,102,241,0.3); }
+.cat-btn[data-cat="engins"].active  { background: #0369a1; border-color: #0369a1; box-shadow: 0 4px 14px rgba(3,105,161,0.3); }
+
+/* Types actifs */
+.type-btn.active        { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 4px 14px rgba(15,23,42,0.25); transform: translateY(-1px); }
+.type-vente.active      { background: #f59e0b; border-color: #f59e0b; color: var(--primary); box-shadow: 0 4px 14px rgba(245,158,11,0.35); }
+.type-location.active   { background: #10b981; border-color: #10b981; color: white; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
+
+.filter-result-count {
+    font-size: 0.8rem;
+    color: var(--gray);
+    font-style: italic;
+    min-height: 18px;
+}
+
+/* Cartes cachées */
+.annonce-card-pro.hidden { display: none; }
+</style>
+
+<script>
+function applyFilter(gridId) {
+    const catGroup  = document.getElementById('catFilter'  + (gridId === 'home' ? 'Home' : 'List'));
+    const typeGroup = document.getElementById('typeFilter' + (gridId === 'home' ? 'Home' : 'List'));
+    const grid      = document.getElementById(gridId === 'home' ? 'homeAnnonceGrid' : 'annoncesGrid');
+    const countEl   = document.getElementById(gridId === 'home' ? 'homeResultCount' : 'listResultCount');
+
+    // Lire le bouton actif
+    const activeCatBtn = catGroup.querySelector('.smart-btn.active');
+    const activeTypeBtn = typeGroup.querySelector('.smart-btn.active');
+
+    // Gérer l'activation du bouton cliqué (toggle dans le groupe)
+    const clicked = event.currentTarget;
+    if (clicked.classList.contains('cat-btn')) {
+        catGroup.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        clicked.classList.add('active');
+    } else if (clicked.classList.contains('type-btn')) {
+        typeGroup.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        clicked.classList.add('active');
+    }
+
+    const selCat  = catGroup.querySelector('.smart-btn.active')?.dataset.cat  || 'all';
+    const selType = typeGroup.querySelector('.smart-btn.active')?.dataset.type || 'all';
+
+    const cardSel = gridId === 'home' ? '#homeAnnonceGrid .annonce-card-pro' : '#annoncesGrid .annonce-card';
+    const cards = document.querySelectorAll(cardSel);
+
+    let visible = 0;
+    cards.forEach(card => {
+        const matchCat  = selCat  === 'all' || card.dataset.cat  === selCat;
+        const matchType = selType === 'all' || card.dataset.type === selType;
+        if (matchCat && matchType) {
+            card.classList.remove('hidden');
+            visible++;
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+
+    if (countEl) {
+        countEl.textContent = visible === 0
+            ? 'Aucun bien correspond à cette sélection.'
+            : `${visible} bien${visible > 1 ? 's' : ''} affiché${visible > 1 ? 's' : ''}`;
+    }
+
+    // Afficher/masquer message vide
+    let emptyId = gridId === 'home' ? 'noResultsHome' : 'noResultsList';
+    let msg = document.getElementById(emptyId);
+    if (!msg) {
+        msg = document.createElement('div');
+        msg.id = emptyId;
+        msg.style.cssText = 'grid-column:1/-1;text-align:center;padding:60px 0;color:#64748b;';
+        msg.innerHTML = '<i class="fas fa-search" style="font-size:2.5rem;display:block;margin-bottom:15px;color:#e2e8f0;"></i>Aucun bien dans cette catégorie pour le moment.';
+        grid.appendChild(msg);
+    }
+    msg.style.display = visible === 0 ? 'block' : 'none';
+}
+
+// Sticky Search Bar Logic
+document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.querySelector('.search-wrapper');
+    const container = document.querySelector('.search-container-glass');
+    if (!wrapper || !container) return;
+
+    function handleScroll() {
+        if (window.innerWidth <= 768) {
+            container.classList.remove('is-sticky');
+            container.style.top = '';
+            container.style.width = '';
+            return;
+        }
+
+        const header = document.querySelector('header');
+        const headerHeight = header ? header.offsetHeight : 80;
+        const wrapperRect = wrapper.getBoundingClientRect();
+        
+        if (wrapperRect.top <= headerHeight) {
+            container.classList.add('is-sticky');
+            container.style.top = headerHeight + 'px';
+            container.style.width = wrapperRect.width + 'px';
+        } else {
+            container.classList.remove('is-sticky');
+            container.style.top = '';
+            container.style.width = '';
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+});
+</script>
 
 <?php include 'layout_footer.php'; ?>

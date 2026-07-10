@@ -1,18 +1,7 @@
 <?php include __DIR__ . '/../layout_header.php'; ?>
 
 <div class="admin-container">
-    <aside class="admin-sidebar">
-        <ul>
-            <li><a href="<?php echo BASE_URL; ?>/admin" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/annonces"><i class="fas fa-home"></i> Annonces</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/publications"><i class="fas fa-bullhorn"></i> Publications</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/leads"><i class="fas fa-envelope"></i> Leads</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/consultants"><i class="fas fa-users"></i> Consultants</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/settings"><i class="fas fa-cogs"></i> Entreprise</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/admin/profil"><i class="fas fa-user-circle"></i> Profil</a></li>
-            <li><a href="<?php echo BASE_URL; ?>/logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
-        </ul>
-    </aside>
+    <?php include __DIR__ . '/sidebar.php'; ?>
     
     <main class="admin-content">
         <header class="admin-header">
@@ -21,34 +10,34 @@
         </header>
 
         <div class="stats-grid">
-            <div class="stat-card">
+            <a href="<?php echo BASE_URL; ?>/admin/annonces" class="stat-card">
                 <i class="fas fa-home"></i>
                 <div>
                     <h4>Total Annonces</h4>
                     <p><?php echo $stats['total_annonces']; ?></p>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="<?php echo BASE_URL; ?>/admin/annonces" class="stat-card">
                 <i class="fas fa-eye"></i>
                 <div>
                     <h4>Vues Totales</h4>
                     <p><?php echo number_format($stats['total_views'], 0, ',', ' '); ?></p>
                 </div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-users"></i>
+            </a>
+            <a href="<?php echo BASE_URL; ?>/admin/leads" class="stat-card">
+                <i class="fas fa-envelope"></i>
                 <div>
                     <h4>Nouveaux Leads</h4>
                     <p><?php echo $stats['total_leads']; ?></p>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="<?php echo BASE_URL; ?>/admin/publications" class="stat-card">
                 <i class="fas fa-paper-plane"></i>
                 <div>
                     <h4>Publications</h4>
                     <p><?php echo $stats['total_publications']; ?></p>
                 </div>
-            </div>
+            </a>
         </div>
 
         <div class="annonce-table-card" style="padding: 30px;">

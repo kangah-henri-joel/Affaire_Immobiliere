@@ -25,9 +25,14 @@ class PublicationModel extends Model {
     }
 
     public function getAll() {
-        $sql = "SELECT p.*, a.title as annonce_title 
-                FROM publications p 
-                JOIN annonces a ON p.annonce_id = a.id 
+        $sql = "SELECT p.*, a.title as annonce_title, a.price as annonce_price,
+                       a.location_name, a.type as annonce_type, a.whatsapp_contact,
+                       c.name as category_name,
+                       i.file_path as image_path
+                FROM publications p
+                JOIN annonces a ON p.annonce_id = a.id
+                JOIN categories c ON a.category_id = c.id
+                LEFT JOIN images i ON i.annonce_id = a.id AND i.is_main = 1
                 ORDER BY p.scheduled_at DESC";
         return $this->fetchAll($sql);
     }
