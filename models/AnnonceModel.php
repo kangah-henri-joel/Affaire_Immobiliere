@@ -27,8 +27,30 @@ class AnnonceModel extends Model {
         }
 
         if (!empty($filters['category'])) {
-            $sql .= " AND LOWER(c.slug) = LOWER(?)";
-            $params[] = trim($filters['category']);
+            $cat = strtolower(trim($filters['category']));
+            if ($cat === 'vehicule' || $cat === 'engins') {
+                $sql .= " AND (LOWER(c.slug) LIKE '%vehicule%' OR LOWER(c.slug) LIKE '%engin%' OR LOWER(c.slug) LIKE '%auto%' OR LOWER(c.slug) LIKE '%moto%' OR LOWER(c.slug) LIKE '%car%')";
+            } elseif ($cat === 'maison') {
+                $sql .= " AND (LOWER(c.slug) LIKE '%maison%' OR LOWER(c.slug) LIKE '%studio%' OR LOWER(c.slug) LIKE '%magasin%' OR LOWER(c.slug) LIKE '%appartement%')";
+            } else {
+                $sql .= " AND LOWER(c.slug) = ?";
+                $params[] = $cat;
+            }
+        }
+
+        if (isset($filters['price_min']) && $filters['price_min'] !== '' && is_numeric($filters['price_min'])) {
+            $sql .= " AND a.price >= ?";
+            $params[] = (float)$filters['price_min'];
+        }
+
+        if (isset($filters['price_max']) && $filters['price_max'] !== '' && is_numeric($filters['price_max'])) {
+            $sql .= " AND a.price <= ?";
+            $params[] = (float)$filters['price_max'];
+        }
+
+        if (!empty($filters['type']) && in_array($filters['type'], ['vente', 'location'])) {
+            $sql .= " AND a.type = ?";
+            $params[] = $filters['type'];
         }
 
         if (!empty($filters['query'])) {

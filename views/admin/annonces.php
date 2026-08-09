@@ -26,6 +26,7 @@
                             <th>Catégorie</th>
                             <th>Prix</th>
                             <th>Type</th>
+                            <th>Vues</th>
                             <th>Statut</th>
                             <th>Actions</th>
                         </tr>
@@ -74,6 +75,7 @@
                                     <td><?php echo htmlspecialchars($a['category_name']); ?></td>
                                     <td><strong><?php echo number_format($a['price'], 0, ',', ' '); ?></strong> <span style="font-size:0.8rem">FCFA</span></td>
                                     <td><span class="badge-type <?php echo $a['type']; ?>"><?php echo ucfirst($a['type']); ?></span></td>
+                                    <td><span style="display:flex; align-items:center; gap:5px; font-weight:600; color:var(--gray);"><i class="fas fa-eye"></i> <?php echo (int)($a['views_count'] ?? 0); ?></span></td>
                                     <td>
                                         <?php if ($a['status'] === 'brouillon'): ?>
                                             <span class="status-badge status-draft">Brouillon</span>
@@ -83,6 +85,14 @@
                                     </td>
                                     <td>
                                         <div class="actions-flex">
+                                            <?php if ($a['status'] === 'brouillon'): ?>
+                                                <a href="<?php echo BASE_URL; ?>/admin/annonces/publish?id=<?php echo $a['id']; ?>" 
+                                                   class="btn-action-icon btn-publish" 
+                                                   onclick="return confirm('Voulez-vous publier cette annonce et la rendre visible pour tout le monde ?');"
+                                                   title="Publier l'annonce">
+                                                    <i class="fas fa-upload"></i>
+                                                </a>
+                                            <?php endif; ?>
                                             <a href="<?php echo BASE_URL; ?>/annonce/<?php echo $a['id']; ?>" class="btn-action-icon btn-view" title="Voir l'annonce publique"><i class="fas fa-eye"></i></a>
                                             <a href="<?php echo BASE_URL; ?>/admin/affiche?annonce_id=<?php echo $a['id']; ?>" class="btn-action-icon btn-affiche" title="Générer une affiche"><i class="fas fa-bullhorn"></i></a>
                                             <a href="<?php echo BASE_URL; ?>/admin/annonces/delete?id=<?php echo $a['id']; ?>" 
@@ -240,6 +250,7 @@
 .btn-action-icon { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1.5px solid #e2e8f0; color: var(--primary); transition: all 0.2s; text-decoration: none; }
 .btn-action-icon:hover { background: #f1f5f9; color: var(--secondary); border-color: var(--secondary); }
 .btn-action-icon.btn-delete:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+.btn-action-icon.btn-publish:hover { background: #dcfce7; color: #15803d; border-color: #86efac; }
 
 /* Media thumbnails display list */
 .admin-annonce-medias { display: flex; gap: 6px; overflow-x: auto; max-width: 180px; padding: 4px 0; }
@@ -257,6 +268,63 @@
 .media-preview-item.selected-primary { border-color: var(--secondary); box-shadow: 0 0 6px rgba(245,158,11,0.5); }
 .media-preview-item img, .media-preview-item video { width: 100%; height: 100%; object-fit: cover; }
 .primary-indicator-label { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(245,158,11,0.85); color: var(--primary); font-size: 0.58rem; font-weight: 800; text-align: center; text-transform: uppercase; padding: 2px 0; }
+
+/* Mobile Adaptation Rules */
+@media (max-width: 768px) {
+    .admin-content { padding: 15px 10px !important; }
+
+    /* Header */
+    .header-flex { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 15px; }
+    .header-flex h1 { font-size: 1.4rem; text-align: center; }
+    .header-flex .btn-primary { width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; border-radius: 12px; }
+
+    /* Modal Ajout Annonce */
+    .modal-content {
+        width: 95% !important;
+        max-width: 100% !important;
+        margin: 12px auto !important;
+        padding: 20px 14px !important;
+        border-radius: 16px !important;
+        max-height: 94vh;
+        overflow-y: auto;
+    }
+    .modal-content h2 { font-size: 1.3rem; }
+    .close { font-size: 1.8rem; }
+    .form-grid { grid-template-columns: 1fr !important; gap: 12px !important; margin-bottom: 12px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { font-size: 0.88rem; }
+    .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; font-size: 0.9rem; }
+
+    /* Geo bar sur mobile */
+    .geo-search-bar { flex-direction: column; gap: 8px; }
+    .geo-search-input-wrap { width: 100%; padding: 0 10px; }
+    .btn-geo-search, .btn-geo-me { width: 100%; height: 42px; justify-content: center; font-size: 0.88rem; }
+    #map-picker { height: 230px !important; }
+
+    /* Modal Submit buttons */
+    #addAnnonceModal form > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    .btn-submit { padding: 12px; font-size: 0.9rem; }
+
+    /* Table responsive styling on mobile */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
+    }
+    table { min-width: 720px; }
+    th, td { padding: 10px 8px; font-size: 0.82rem; }
+    .admin-annonce-medias { max-width: 130px; }
+    .actions-flex { gap: 4px; }
+    .btn-action-icon { width: 32px; height: 32px; font-size: 0.8rem; }
+}
+
+@media (max-width: 480px) {
+    .admin-content { padding: 10px 6px !important; }
+    .btn-action-icon { width: 30px; height: 30px; font-size: 0.75rem; }
+}
 </style>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

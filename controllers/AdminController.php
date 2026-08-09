@@ -8,8 +8,8 @@ class AdminController extends Controller {
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
         }
-        $role = $_SESSION['user_role'] ?? 'agent';
-        if (!in_array($role, ['admin', 'super_admin'])) {
+        $role = $_SESSION['user_role'] ?? 'client';
+        if (!in_array($role, ['agent', 'admin', 'super_admin'])) {
             $this->redirect('/login');
         }
     }
@@ -144,6 +144,20 @@ class AdminController extends Controller {
         $actionLog = new ActionLogModel();
         $actionLog->log($_SESSION['user_id'], "Création d'annonce", "L'annonce '{$data['title']}' a été créée avec le statut: " . ($data['status'] === 'brouillon' ? 'Brouillon' : 'Publiée'));
 
+        if ($data['status'] !== 'brouillon') {
+            $clients = $userModel->getAllActiveClientsEmails();
+            if (!empty($clients)) {
+                require_once __DIR__ . '/../config/MailHelper.php';
+                $subject = "Nouvelle annonce disponible : " . $data['title'];
+                $message = "<h2>Bonjour,</h2><p>Une nouvelle annonce qui pourrait vous intéresser vient d'être publiée sur ImmoAffaire : <strong>{$data['title']}</strong>.</p><p>Connectez-vous pour la découvrir !</p><p>L'équipe ImmoAffaire</p>";
+                foreach ($clients as $client) {
+                    if (!empty($client['email'])) {
+                        MailHelper::send($client['email'], $subject, $message);
+                    }
+                }
+            }
+        }
+
         $this->redirect('/admin/annonces');
     }
 
@@ -195,7 +209,16 @@ class AdminController extends Controller {
             $annonces     = $annonceModel->getAll(['include_drafts' => true]);
         } else {
             $db   = $model->getDb();
-            $sql  = "SELECT p.*, a.title as annonce_title FROM publications p JOIN annonces a ON p.annonce_id = a.id WHERE a.user_id = ? ORDER BY p.scheduled_at DESC";
+            $sql  = "SELECT p.*, a.title as annonce_title, a.price as annonce_price,
+                            a.location_name, a.type as annonce_type, a.whatsapp_contact,
+                            c.name as category_name,
+                            i.file_path as image_path
+                     FROM publications p
+                     JOIN annonces a ON p.annonce_id = a.id
+                     JOIN categories c ON a.category_id = c.id
+                     LEFT JOIN images i ON i.annonce_id = a.id AND i.is_main = 1
+                     WHERE a.user_id = ?
+                     ORDER BY p.scheduled_at DESC";
             $stmt = $db->prepare($sql);
             $stmt->execute([$userId]);
             $publications = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -256,6 +279,41 @@ class AdminController extends Controller {
             echo json_encode($pub);
             exit;
         }
+    }
+
+    public function publishAnnonce() {
+        if (isset($_GET['id'])) {
+            $model = new AnnonceModel();
+            $id = (int)$_GET['id'];
+            $annonce = $model->getById($id);
+            $role = $_SESSION['user_role'] ?? 'agent';
+            
+            // Check ownership/authorization
+            if ($annonce && ($role === 'super_admin' || (int)$annonce['user_id'] === (int)$_SESSION['user_id'])) {
+                if ($annonce['status'] === 'brouillon') {
+                    $db = $model->getDb();
+                    $db->prepare("UPDATE annonces SET status = 'disponible' WHERE id = ?")->execute([$id]);
+                    
+                    $actionLog = new ActionLogModel();
+                    $actionLog->log($_SESSION['user_id'], "Publication d'annonce", "L'annonce '{$annonce['title']}' est passée de brouillon à publiée.");
+
+                    // Notifier les clients actifs
+                    $userModel = new UserModel();
+                    $clients = $userModel->getAllActiveClientsEmails();
+                    if (!empty($clients)) {
+                        require_once __DIR__ . '/../config/MailHelper.php';
+                        $subject = "Nouvelle annonce disponible : " . $annonce['title'];
+                        $message = "<h2>Bonjour,</h2><p>Une nouvelle annonce qui pourrait vous intéresser vient d'être publiée sur ImmoAffaire : <strong>{$annonce['title']}</strong>.</p><p>Connectez-vous pour la découvrir !</p><p>L'équipe ImmoAffaire</p>";
+                        foreach ($clients as $client) {
+                            if (!empty($client['email'])) {
+                                MailHelper::send($client['email'], $subject, $message);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $this->redirect('/admin/annonces?success=published');
     }
 
     public function deleteAnnonce() {

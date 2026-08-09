@@ -18,7 +18,7 @@ class BureauModel extends Model {
         return $this->fetchAll("SELECT b.*, u.full_name as admin_name, u.username, u.avatar as admin_avatar
                                 FROM bureaux b
                                 JOIN users u ON b.user_id = u.id
-                                WHERE u.role = 'admin' OR u.role = 'super_admin'
+                                WHERE u.role IN ('admin', 'super_admin', 'agent')
                                 ORDER BY b.created_at DESC");
     }
 
@@ -41,12 +41,13 @@ class BureauModel extends Model {
     }
 
     public function create($userId, $data) {
-        $sql = "INSERT INTO bureaux (user_id, nom, adresse, phone_whatsapp, phone_tel, phone_fixe, email, description, logo)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO bureaux (user_id, nom, adresse, ville, phone_whatsapp, phone_tel, phone_fixe, email, description, logo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return $this->query($sql, [
             (int)$userId,
             $data['nom'] ?? null,
             $data['adresse'] ?? null,
+            $data['ville'] ?? null,
             $data['phone_whatsapp'] ?? null,
             $data['phone_tel'] ?? null,
             $data['phone_fixe'] ?? null,
@@ -57,11 +58,12 @@ class BureauModel extends Model {
     }
 
     public function update($id, $data) {
-        $sql = "UPDATE bureaux SET nom=?, adresse=?, phone_whatsapp=?, phone_tel=?, phone_fixe=?, email=?, description=?, logo=?
+        $sql = "UPDATE bureaux SET nom=?, adresse=?, ville=?, phone_whatsapp=?, phone_tel=?, phone_fixe=?, email=?, description=?, logo=?
                 WHERE id=?";
         return $this->query($sql, [
             $data['nom'] ?? null,
             $data['adresse'] ?? null,
+            $data['ville'] ?? null,
             $data['phone_whatsapp'] ?? null,
             $data['phone_tel'] ?? null,
             $data['phone_fixe'] ?? null,

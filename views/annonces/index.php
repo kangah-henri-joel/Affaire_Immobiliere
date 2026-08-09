@@ -21,16 +21,17 @@
             <div class="smart-filter-row">
                 <span class="filter-label">Catégorie :</span>
                 <div class="smart-filter-group" id="catFilterList">
-                    <button class="smart-btn cat-btn active" data-cat="all" onclick="applyFilter('list')">
+                    <?php $currentCat = $_GET['category'] ?? ''; ?>
+                    <button class="smart-btn cat-btn <?php echo empty($currentCat) ? 'active' : ''; ?>" data-cat="all" onclick="applyFilter('list')">
                         <i class="fas fa-th-large"></i> Tout
                     </button>
-                    <button class="smart-btn cat-btn" data-cat="terrain" onclick="applyFilter('list')">
+                    <button class="smart-btn cat-btn <?php echo ($currentCat === 'terrain') ? 'active' : ''; ?>" data-cat="terrain" onclick="applyFilter('list')">
                         <i class="fas fa-mountain"></i> Terrain
                     </button>
-                    <button class="smart-btn cat-btn" data-cat="maison" onclick="applyFilter('list')">
+                    <button class="smart-btn cat-btn <?php echo ($currentCat === 'maison') ? 'active' : ''; ?>" data-cat="maison" onclick="applyFilter('list')">
                         <i class="fas fa-home"></i> Maison
                     </button>
-                    <button class="smart-btn cat-btn" data-cat="engins" onclick="applyFilter('list')">
+                    <button class="smart-btn cat-btn <?php echo (in_array($currentCat, ['vehicule', 'engins'])) ? 'active' : ''; ?>" data-cat="engins" onclick="applyFilter('list')">
                         <i class="fas fa-car"></i> Engins (Voiture, Moto)
                     </button>
                 </div>
@@ -44,16 +45,16 @@
             <form action="<?php echo BASE_URL; ?>/annonces" method="GET">
                 <div class="filter-group">
                     <label>Catégorie</label>
-                    <select name="category">
+                    <select name="category" onchange="this.form.submit()">
                         <option value="">Toutes</option>
                         <option value="terrain" <?php echo (($_GET['category'] ?? '') === 'terrain') ? 'selected' : ''; ?>>Terrains</option>
                         <option value="maison" <?php echo (($_GET['category'] ?? '') === 'maison') ? 'selected' : ''; ?>>Maisons</option>
-                        <option value="vehicule" <?php echo (($_GET['category'] ?? '') === 'vehicule') ? 'selected' : ''; ?>>Véhicules</option>
+                        <option value="vehicule" <?php echo (in_array(($_GET['category'] ?? ''), ['vehicule', 'engins'])) ? 'selected' : ''; ?>>Véhicules</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label>Prix Max (FCFA)</label>
-                    <input type="number" name="price_max" placeholder="Ex: 10000000" value="<?php echo htmlspecialchars($_GET['price_max'] ?? ''); ?>">
+                    <input type="number" name="price_max" id="filterPriceMax" placeholder="Ex: 10000000" value="<?php echo htmlspecialchars($_GET['price_max'] ?? ''); ?>">
                 </div>
                 <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filtrer</button>
             </form>
@@ -66,11 +67,12 @@
                 <?php foreach ($annonces as $annonce): ?>
                     <div class="annonce-card"
                          data-type="<?php echo $annonce['type']; ?>"
+                         data-price="<?php echo (float)$annonce['price']; ?>"
                          data-cat="<?php
                             $slug = strtolower($annonce['category_name'] ?? '');
                             if (str_contains($slug, 'terrain')) echo 'terrain';
                             elseif (str_contains($slug, 'maison') || str_contains($slug, 'studio') || str_contains($slug, 'magasin') || str_contains($slug, 'appartement')) echo 'maison';
-                            elseif (str_contains($slug, 'v') || str_contains($slug, 'engin') || str_contains($slug, 'auto') || str_contains($slug, 'car')) echo 'engins';
+                            elseif (str_contains($slug, 'v') || str_contains($slug, 'engin') || str_contains($slug, 'auto') || str_contains($slug, 'car') || str_contains($slug, 'moto')) echo 'engins';
                             else echo 'autre';
                          ?>">
                         <div class="annonce-img">
@@ -85,7 +87,7 @@
                             <span class="badge <?php echo $annonce['type']; ?>"><?php echo ucfirst($annonce['type']); ?></span>
                         </div>
                         <div class="annonce-info">
-                            <h3><a href="/Projet_Affaire/annonce/<?php echo $annonce['id']; ?>"><?php echo $annonce['title']; ?></a></h3>
+                            <h3><a href="<?php echo BASE_URL; ?>/annonce/<?php echo $annonce['id']; ?>"><?php echo $annonce['title']; ?></a></h3>
                             <p class="location"><i class="fas fa-map-marker-alt"></i> <?php echo $annonce['location_name']; ?></p>
                             <p class="price"><?php echo number_format($annonce['price'], 0, ',', ' '); ?> FCFA</p>
                             <div class="card-footer">
@@ -345,32 +347,39 @@
 
 <script>
 function applyFilter(gridId) {
-    const catGroup  = document.getElementById('catFilter'  + (gridId === 'home' ? 'Home' : 'List'));
-    const typeGroup = document.getElementById('typeFilter' + (gridId === 'home' ? 'Home' : 'List'));
-    const grid      = document.getElementById(gridId === 'home' ? 'homeAnnonceGrid' : 'annoncesGrid');
-    const countEl   = document.getElementById(gridId === 'home' ? 'homeResultCount' : 'listResultCount');
+    const catGroup   = document.getElementById('catFilter'  + (gridId === 'home' ? 'Home' : 'List'));
+    const typeGroup  = document.getElementById('typeFilter' + (gridId === 'home' ? 'Home' : 'List'));
+    const grid       = document.getElementById(gridId === 'home' ? 'homeAnnonceGrid' : 'annoncesGrid');
+    const countEl    = document.getElementById(gridId === 'home' ? 'homeResultCount' : 'listResultCount');
+    const maxPriceEl = document.getElementById('filterPriceMax');
 
     // Gérer l'activation du bouton cliqué (toggle dans le groupe)
-    const clicked = event.currentTarget;
-    if (clicked.classList.contains('cat-btn')) {
-        catGroup.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-        clicked.classList.add('active');
-    } else if (clicked.classList.contains('type-btn')) {
-        typeGroup.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-        clicked.classList.add('active');
+    if (window.event && window.event.currentTarget) {
+        const clicked = window.event.currentTarget;
+        if (clicked.classList && clicked.classList.contains('cat-btn')) {
+            if (catGroup) catGroup.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            clicked.classList.add('active');
+        } else if (clicked.classList && clicked.classList.contains('type-btn')) {
+            if (typeGroup) typeGroup.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            clicked.classList.add('active');
+        }
     }
 
-    const selCat  = catGroup.querySelector('.smart-btn.active')?.dataset.cat  || 'all';
-    const selType = typeGroup.querySelector('.smart-btn.active')?.dataset.type || 'all';
+    const selCat   = catGroup ? (catGroup.querySelector('.smart-btn.active')?.dataset.cat || 'all') : 'all';
+    const selType  = typeGroup ? (typeGroup.querySelector('.smart-btn.active')?.dataset.type || 'all') : 'all';
+    const maxPrice = (maxPriceEl && maxPriceEl.value !== '') ? parseFloat(maxPriceEl.value) : null;
 
     const cardSel = gridId === 'home' ? '#homeAnnonceGrid .annonce-card-pro' : '#annoncesGrid .annonce-card';
     const cards = document.querySelectorAll(cardSel);
 
     let visible = 0;
     cards.forEach(card => {
-        const matchCat  = selCat  === 'all' || card.dataset.cat  === selCat;
-        const matchType = selType === 'all' || card.dataset.type === selType;
-        if (matchCat && matchType) {
+        const matchCat   = selCat  === 'all' || card.dataset.cat  === selCat;
+        const matchType  = selType === 'all' || card.dataset.type === selType;
+        const cardPrice  = card.dataset.price ? parseFloat(card.dataset.price) : 0;
+        const matchPrice = (maxPrice === null || isNaN(maxPrice)) ? true : (cardPrice <= maxPrice);
+
+        if (matchCat && matchType && matchPrice) {
             card.classList.remove('hidden');
             visible++;
         } else {
@@ -380,22 +389,33 @@ function applyFilter(gridId) {
 
     if (countEl) {
         countEl.textContent = visible === 0
-            ? 'Aucun bien correspond à cette sélection.'
+            ? 'Aucun bien ne correspond à cette sélection.'
             : `${visible} bien${visible > 1 ? 's' : ''} disponible${visible > 1 ? 's' : ''}`;
     }
 
     // Afficher/masquer message vide
     let emptyId = gridId === 'home' ? 'noResultsHome' : 'noResultsList';
     let msg = document.getElementById(emptyId);
-    if (!msg) {
+    if (!msg && grid) {
         msg = document.createElement('div');
         msg.id = emptyId;
         msg.style.cssText = 'grid-column:1/-1;text-align:center;padding:60px 0;color:#64748b;';
         msg.innerHTML = '<i class="fas fa-search" style="font-size:2.5rem;display:block;margin-bottom:15px;color:#e2e8f0;"></i>Aucun bien dans cette catégorie pour le moment.';
         grid.appendChild(msg);
     }
-    msg.style.display = visible === 0 ? 'block' : 'none';
+    if (msg) {
+        msg.style.display = visible === 0 ? 'block' : 'none';
+    }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const maxPriceEl = document.getElementById('filterPriceMax');
+    if (maxPriceEl) {
+        maxPriceEl.addEventListener('input', function() {
+            applyFilter('list');
+        });
+    }
+});
 </script>
 
 

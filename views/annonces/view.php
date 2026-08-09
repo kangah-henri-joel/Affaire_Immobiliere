@@ -143,6 +143,17 @@ function renderCommentTree($comments, $parentId = null, $depth = 0) {
                         <span><i class="fas fa-calendar"></i> <?php echo date('d/m/Y', strtotime($annonce['created_at'])); ?></span>
                         <span><i class="fas fa-eye"></i> <?php echo $annonce['views_count']; ?> vues</span>
                     </div>
+
+                    <!-- Bouton Like -->
+                    <div class="like-section" style="margin: 16px 0;">
+                        <button id="like-btn"
+                                onclick="toggleLike(<?php echo (int)$annonce['id']; ?>)"
+                                class="btn-like <?php echo $hasLiked ? 'liked' : ''; ?>">
+                            <i class="fas fa-heart"></i>
+                            <span id="like-count"><?php echo $likesCount; ?></span>
+                            <span id="like-label"><?php echo $hasLiked ? 'Aimé' : "J'aime"; ?></span>
+                        </button>
+                    </div>
                     <hr>
                     <h3>Description</h3>
                     <div class="text-content">
@@ -696,8 +707,73 @@ video.main-media { object-fit: contain; }
 .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
 
 @media (max-width: 768px) {
-    .detail-grid { grid-template-columns: 1fr; }
-    .media-item { height: 320px; }
+    .annonce-detail { padding: 20px 0; }
+    .detail-grid { grid-template-columns: 1fr; gap: 20px; }
+    .media-item { height: 260px; }
+    .carousel-btn { padding: 10px; font-size: 0.9rem; }
+    .prev { left: 8px; }
+    .next { right: 8px; }
+    .media-thumbnail-grid { gap: 6px; margin-bottom: 20px; }
+    .media-thumb-item { width: 60px; height: 45px; }
+
+    .description-box { padding: 20px 16px; border-radius: 12px; margin-bottom: 20px; }
+    .description-box h1 { font-size: 1.35rem; line-height: 1.3; }
+    .price-big { font-size: 1.6rem; margin: 8px 0 15px; word-break: break-word; overflow-wrap: break-word; }
+    .meta-info { gap: 10px 14px; font-size: 0.85rem; margin-bottom: 15px; }
+    .text-content { font-size: 0.95rem; line-height: 1.6; }
+
+    .map-box { border-radius: 12px; }
+    .map-box-header { padding: 16px 16px 0; gap: 10px; }
+    .map-box-header h3 { font-size: 1rem; }
+    .map-address-text { font-size: 0.85rem; }
+    .map-nav-btns { width: 100%; margin-top: 4px; }
+    .btn-nav { flex: 1; justify-content: center; padding: 8px 10px; font-size: 0.78rem; }
+    .map-layer-toggle { padding: 10px 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .layer-btn { padding: 6px 10px; font-size: 0.78rem; white-space: nowrap; }
+    #map { height: 260px !important; }
+    .map-coords-bar { padding: 8px 14px; font-size: 0.7rem; flex-direction: column; gap: 4px; align-items: flex-start; }
+
+    .comments-box { padding: 20px 16px !important; margin-top: 20px !important; border-radius: 12px !important; }
+    .comments-box h3 { font-size: 1.1rem !important; }
+    .comments-box form { padding: 14px !important; border-radius: 10px !important; }
+
+    /* Fix comment tree nested margins on mobile */
+    .comment-item-wrapper { margin-left: 8px !important; padding-left: 6px !important; }
+    .comment-item { padding: 12px !important; flex-direction: column; gap: 8px !important; }
+    .comment-item p { padding-left: 0 !important; font-size: 0.88rem !important; }
+    .btn-reply-toggle { padding: 0 !important; margin-top: 6px; }
+    .reply-form-container { padding-left: 0 !important; }
+
+    .contact-card { padding: 20px 16px; border-radius: 12px; }
+    .agent-card-header { padding: 14px; gap: 10px; }
+    .agent-avatar { width: 44px; height: 44px; font-size: 18px; }
+    .agent-info h4 { font-size: 0.92rem; }
+    .agent-contacts { padding: 12px; gap: 8px; }
+    .agent-btn { padding: 10px 12px; gap: 10px; }
+    .btn-value { font-size: 0.85rem; word-break: break-all; }
+
+    /* Mobile Floating Chat Widget */
+    .client-chat-widget { bottom: 15px; right: 15px; left: auto; max-width: calc(100vw - 30px); }
+    .chat-widget-trigger { padding: 10px 16px; font-size: 0.82rem; border-radius: 25px; }
+    .chat-widget-panel {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        width: 100vw; height: 100vh; border-radius: 0;
+        z-index: 10005; border: none;
+    }
+
+    /* Lightbox Modal on mobile */
+    .lightbox-close { top: 12px; right: 15px; font-size: 2rem; }
+    .lightbox-nav { width: 44px; height: 44px; font-size: 1.1rem; }
+    .lightbox-prev { left: 10px; }
+    .lightbox-next { right: 10px; }
+    .lightbox-content { max-width: 95%; max-height: 85%; }
+}
+
+@media (max-width: 400px) {
+    .media-item { height: 210px; }
+    .description-box h1 { font-size: 1.2rem; }
+    .price-big { font-size: 1.4rem; }
+    .btn-like { padding: 8px 16px; font-size: 0.88rem; }
 }
 
 /* Lightbox Modal */
@@ -769,6 +845,56 @@ video.main-media { object-fit: contain; }
 .agent-btn-wa:hover { background: #25d366; color: white; border-color: #25d366; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,211,102,0.3); }
 .agent-btn-tel { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
 .agent-btn-tel:hover { background: #1d4ed8; color: white; border-color: #1d4ed8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29,78,216,0.3); }
+
+/* ── Like button ─────────────────────────────────────────────────────────── */
+.btn-like {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 50px;
+    border: 2px solid #e2e8f0; background: #f8fafc;
+    color: #64748b; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s; font-family: inherit;
+}
+.btn-like i { font-size: 1.1rem; transition: transform 0.3s; }
+.btn-like:hover { border-color: #f43f5e; color: #f43f5e; background: #fff1f2; }
+.btn-like:hover i { transform: scale(1.25); }
+.btn-like.liked { background: #fff1f2; border-color: #f43f5e; color: #f43f5e; }
+.btn-like.liked i { color: #f43f5e; }
+.btn-like.pop i { animation: heartPop 0.35s ease; }
+@keyframes heartPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
 </style>
+
+<script>
+async function toggleLike(annonceId) {
+    const btn   = document.getElementById('like-btn');
+    const count = document.getElementById('like-count');
+    const label = document.getElementById('like-label');
+
+    btn.disabled = true;
+    try {
+        const resp = await fetch('<?php echo BASE_URL; ?>/annonce/like', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'annonce_id=' + annonceId
+        });
+        const data = await resp.json();
+        if (data.error) return;
+
+        count.textContent = data.count;
+        if (data.liked) {
+            btn.classList.add('liked', 'pop');
+            label.textContent = 'Aimé';
+            setTimeout(() => btn.classList.remove('pop'), 400);
+        } else {
+            btn.classList.remove('liked');
+            label.textContent = "J'aime";
+        }
+    } catch(e) {}
+    btn.disabled = false;
+}
+</script>
 
 <?php include __DIR__ . '/../layout_footer.php'; ?>

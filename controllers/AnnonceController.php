@@ -28,8 +28,11 @@ class AnnonceController extends Controller {
 
     public function index() {
         $filters = [
-            'category' => $_GET['category'] ?? '',
-            'query'    => $_GET['query'] ?? ''
+            'category'  => $_GET['category'] ?? '',
+            'query'     => $_GET['query'] ?? '',
+            'price_max' => $_GET['price_max'] ?? '',
+            'price_min' => $_GET['price_min'] ?? '',
+            'type'      => $_GET['type'] ?? '',
         ];
         $annonces = $this->model->getAll($filters);
         $this->render('annonces/index', ['annonces' => $annonces, 'title' => 'Toutes les Annonces']);
@@ -82,6 +85,18 @@ class AnnonceController extends Controller {
             }
         }
 
+        // Charger les likes (silencieux si la table n'existe pas encore)
+        $likesCount = 0;
+        $hasLiked   = false;
+        try {
+            $likeModel  = new LikeModel();
+            $visitorId  = LikeModel::getVisitorId();
+            $likesCount = $likeModel->countLikes((int)$id);
+            $hasLiked   = $likeModel->hasLiked((int)$id, $visitorId);
+        } catch (\Exception $e) {
+            // Table 'likes' pas encore créée – ne pas bloquer la page
+        }
+
         $this->render('annonces/view', [
             'annonce'            => $annonce, 
             'media'              => $media,
@@ -89,7 +104,9 @@ class AnnonceController extends Controller {
             'knownAuthorName'    => $knownAuthorName,
             'clientConvId'       => $clientConvId,
             'clientConvMessages' => $clientConvMessages,
-            'title'              => $annonce['title']
+            'title'              => $annonce['title'],
+            'likesCount'         => $likesCount,
+            'hasLiked'           => $hasLiked,
         ]);
     }
 
@@ -254,5 +271,35 @@ class AnnonceController extends Controller {
         $db->prepare("UPDATE images SET is_main = 0 WHERE annonce_id = ?")->execute([$annonceId]);
         $db->prepare("UPDATE images SET is_main = 1 WHERE id = ? AND annonce_id = ?")->execute([$mediaId, $annonceId]);
         $this->redirect('/admin/annonces?success=main_set');
+    }
+
+    /** Toggle like sur une annonce (réponse JSON) */
+    public function toggleLike() {
+        header('Content-Type: application/json');
+        $annonceId = (int)($_POST['annonce_id'] ?? 0);
+        if (!$annonceId) {
+            echo json_encode(['error' => 'Invalid id']);
+            exit;
+        }
+        try {
+            $likeModel = new LikeModel();
+            $visitorId = LikeModel::getVisitorId();
+
+            if ($likeModel->hasLiked($annonceId, $visitorId)) {
+                $likeModel->removeLike($annonceId, $visitorId);
+                $liked = false;
+            } else {
+                $likeModel->addLike($annonceId, $visitorId);
+                $liked = true;
+            }
+
+            echo json_encode([
+                'liked' => $liked,
+                'count' => $likeModel->countLikes($annonceId),
+            ]);
+        } catch (\Exception $e) {
+            echo json_encode(['error' => 'La table likes n\'existe pas encore. Créez-la dans PhpMyAdmin.']);
+        }
+        exit;
     }
 }

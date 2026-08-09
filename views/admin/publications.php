@@ -79,8 +79,9 @@
                                                          . "\u{1F4B0} Prix : " . number_format($p['annonce_price'] ?? 0, 0, ',', ' ') . " FCFA\n"
                                                          . "\u{1F4CD} " . ($p['location_name'] ?? '') . "\n"
                                                          . "\u{1F5C2} " . ($p['category_name'] ?? '') . ' — ' . ucfirst($p['annonce_type'] ?? '') . "\n\n"
-                                                         . ($p['generated_text'] ?? '') . "\n\n"
-                                                         . "\u{1F449} Voir le bien : " . $annUrl;
+                                                         . "\u{1F449} Voir le bien : " . $annUrl . "\n\n"
+                                                         . ($p['generated_text'] ?? "Bonjour, je suis intéressé par ce bien. Merci !") . "\n\n"
+                                                         . "\u{1F4F8} Photo : " . $imgUrl;
                                             ?>
 
                                             <?php if($p['platform'] == 'whatsapp'): ?>
@@ -199,7 +200,8 @@
 
             <div class="form-group">
                 <label>Texte Publicitaire</label>
-                <textarea name="generated_text" id="pubText" rows="6" placeholder="Le texte généré apparaîtra ici..."></textarea>
+                <textarea name="generated_text" id="pubText" rows="6" placeholder="Le texte généré apparaîtra ici..." oninput="updateCounters()"></textarea>
+                <div id="textCounters" style="font-size: 0.85rem; color: var(--gray); text-align: right; margin-top: 5px; font-weight: 600;">0/10 lignes | 0/500 mots</div>
             </div>
 
             <button type="submit" class="btn-submit" id="btnSubmit">Valider la programmation</button>
@@ -233,13 +235,45 @@ function syncSinglePlatform() {
 
 function validatePlatforms() {
     const isEdit = document.getElementById('pubId').value !== '';
-    if (isEdit) return true; // en édition, la plateforme est dans le champ hidden
-    const checked = document.querySelectorAll('.platform-chk:checked');
-    if (checked.length === 0) {
-        alert('Veuillez sélectionner au moins une plateforme.');
+    if (!isEdit) {
+        const checked = document.querySelectorAll('.platform-chk:checked');
+        if (checked.length === 0) {
+            alert('Veuillez sélectionner au moins une plateforme.');
+            return false;
+        }
+    }
+    
+    // Validation des mots et lignes
+    const text = document.getElementById('pubText').value;
+    const lines = text === '' ? 0 : text.split('\n').length;
+    const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    
+    if (lines > 10) {
+        alert('Votre texte fait ' + lines + ' lignes. Veuillez le réduire à 10 lignes maximum pour les réseaux sociaux.');
         return false;
     }
+    if (words > 500) {
+        alert('Votre texte fait ' + words + ' mots. Veuillez le réduire à 500 mots maximum pour les réseaux sociaux.');
+        return false;
+    }
+    
     return true;
+}
+
+function updateCounters() {
+    const text = document.getElementById('pubText').value;
+    const lines = text === '' ? 0 : text.split('\n').length;
+    const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    
+    const counterDiv = document.getElementById('textCounters');
+    if(counterDiv) {
+        counterDiv.innerHTML = `${lines}/10 lignes | ${words}/500 mots`;
+        if (lines > 10 || words > 500) {
+            counterDiv.style.color = 'var(--danger)';
+        } else {
+            counterDiv.style.color = 'var(--gray)';
+        }
+    }
 }
 
 function toggleModal(id) {
@@ -258,6 +292,7 @@ function openAddModal() {
     document.querySelectorAll('.platform-chk').forEach(c => c.checked = false);
     document.getElementById('pubPlatform').value = '';
     document.getElementById('btnSubmit').innerText = 'Valider la programmation';
+    updateCounters();
     toggleModal('publishModal');
 }
 

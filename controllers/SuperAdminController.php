@@ -94,7 +94,7 @@ class SuperAdminController extends Controller {
 
     public function changeRole() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id   = (int)$_POST['user_id'];
+            $id   = (int)$_POST['id'];
             $role = $_POST['role'];
             if ($id !== (int)$_SESSION['user_id']) {
                 $model = new UserModel();
@@ -138,6 +138,22 @@ class SuperAdminController extends Controller {
             }
         }
         $this->redirect('/super-admin/users?success=deleted');
+    }
+
+    public function validateUser() {
+        if (isset($_GET['id'])) {
+            $id = (int)$_GET['id'];
+            $model = new UserModel();
+            $target = $model->getById($id);
+            if ($target && $target['status'] === 'pending') {
+                $model->updateStatus($id, 'active');
+                
+                // Add log
+                $actionLog = new ActionLogModel();
+                $actionLog->log($_SESSION['user_id'], "Validation d'agent", "Agent ID {$id} validé.");
+            }
+        }
+        $this->redirect('/super-admin/users?success=validated');
     }
 
     // ─── Gestion des Leads ────────────────────────────────────────────────────

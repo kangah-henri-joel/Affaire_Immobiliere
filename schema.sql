@@ -3,11 +3,11 @@
 -- Importez UNIQUEMENT ce fichier dans phpMyAdmin ou MySQL CLI.
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS immo_affaire_db
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
+-- CREATE DATABASE IF NOT EXISTS immo_affaire_db
+--     CHARACTER SET utf8mb4
+--     COLLATE utf8mb4_unicode_ci;
 
-USE immo_affaire_db;
+-- USE immo_affaire_db;
 
 -- ── Utilisateurs ──────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
@@ -15,12 +15,14 @@ CREATE TABLE IF NOT EXISTS users (
     username        VARCHAR(50) NOT NULL UNIQUE,
     password        VARCHAR(255) NOT NULL,
     full_name       VARCHAR(100),
-    role            ENUM('super_admin', 'admin', 'agent') NOT NULL DEFAULT 'agent',
-    status          ENUM('active', 'inactive') DEFAULT 'active',
+    email           VARCHAR(150) UNIQUE,
+    role            ENUM('super_admin', 'admin', 'agent', 'client') NOT NULL DEFAULT 'client',
+    status          ENUM('active', 'inactive', 'pending') DEFAULT 'active',
     avatar          VARCHAR(255),
     phone_whatsapp  VARCHAR(25),
     phone_tel       VARCHAR(25),
     phone_fixe      VARCHAR(25),
+    country         VARCHAR(100),
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -52,6 +54,16 @@ CREATE TABLE IF NOT EXISTS annonces (
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ── Likes visiteurs ───────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS likes (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    annonce_id INT NOT NULL,
+    visitor_id VARCHAR(128) NOT NULL COMMENT 'Identifiant de session visiteur',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_like (annonce_id, visitor_id),
+    FOREIGN KEY (annonce_id) REFERENCES annonces(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ── Images / médias ───────────────────────────────────────────────────────────
@@ -125,6 +137,7 @@ CREATE TABLE IF NOT EXISTS bureaux (
     user_id        INT NOT NULL UNIQUE,
     nom            VARCHAR(150),
     adresse        TEXT,
+    ville          VARCHAR(100),
     phone_whatsapp VARCHAR(25),
     phone_tel      VARCHAR(25),
     phone_fixe     VARCHAR(25),
@@ -224,7 +237,8 @@ INSERT IGNORE INTO categories (name, slug) VALUES
 ('Maison',   'maison'),
 ('Studio',   'studio'),
 ('Magasin',  'magasin'),
-('Véhicule', 'vehicule');
+('Véhicule', 'vehicule'),
+('moto', 'moto');
 
 INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
 ('company_name',     'ImmoAffaire'),
@@ -234,7 +248,7 @@ INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
 ('social_facebook',  ''),
 ('social_tiktok',    ''),
 ('company_whatsapp', ''),
-('site_url',         '');
+('site_url',         'https://immbilierkangagh.site.je');
 
 -- Comptes par défaut (mot de passe : admin123)
 INSERT IGNORE INTO users (username, password, full_name, role) VALUES

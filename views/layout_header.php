@@ -60,8 +60,6 @@ $companyName = $siteSettings['company_name'] ?? 'ImmoAffaire';
                     
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li><a href="<?php echo BASE_URL; ?>/admin" class="btn-admin-nav"><i class="fas fa-lock"></i> Admin</a></li>
-                    <?php else: ?>
-                        <li><a href="<?php echo BASE_URL; ?>/login" class="btn-login-nav">Connexion</a></li>
                     <?php endif; ?>
                 </ul>
 

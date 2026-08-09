@@ -42,7 +42,12 @@
                                 </div>
                             </td>
                             <td style="color:var(--sa-gray);">@<?php echo htmlspecialchars($u['username']); ?></td>
-                            <td><span class="role-badge role-<?php echo $u['role']; ?>"><?php echo str_replace('_',' ',$u['role']); ?></span></td>
+                            <td>
+                                <span class="role-badge role-<?php echo $u['role']; ?>"><?php echo str_replace('_',' ',$u['role']); ?></span>
+                                <?php if($u['status'] === 'pending'): ?>
+                                    <span style="background:var(--sa-warning); color:#fff; padding:2px 5px; border-radius:3px; font-size:10px; margin-left:5px;">En attente</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <?php if($u['id']!=$_SESSION['user_id'] && $u['role']!=='super_admin'): ?>
                                 <form action="<?php echo BASE_URL; ?>/super-admin/users/role" method="POST" style="display:flex;gap:5px;align-items:center;">
@@ -50,6 +55,7 @@
                                     <select name="role" style="background:rgba(255,255,255,0.06);border:1px solid var(--sa-border);border-radius:6px;padding:5px 8px;color:white;font-size:12px;">
                                         <option value="admin" <?php echo $u['role']==='admin'?'selected':''; ?>>Admin</option>
                                         <option value="agent" <?php echo $u['role']==='agent'?'selected':''; ?>>Agent</option>
+                                        <option value="client" <?php echo $u['role']==='client'?'selected':''; ?>>Client</option>
                                     </select>
                                     <button type="submit" class="sa-btn sa-btn-warning sa-btn-sm"><i class="fas fa-exchange-alt"></i></button>
                                 </form>
@@ -57,6 +63,9 @@
                             </td>
                             <td>
                                 <?php if($u['id']!=$_SESSION['user_id'] && $u['role']!=='super_admin'): ?>
+                                <?php if($u['status'] === 'pending'): ?>
+                                <a href="<?php echo BASE_URL; ?>/super-admin/users/validate?id=<?php echo $u['id']; ?>" class="sa-btn sa-btn-success sa-btn-sm" onclick="return confirm('Valider ce compte agent ?')" title="Valider"><i class="fas fa-check"></i></a>
+                                <?php endif; ?>
                                 <a href="<?php echo BASE_URL; ?>/super-admin/users/delete?id=<?php echo $u['id']; ?>" class="sa-btn sa-btn-danger sa-btn-sm" onclick="return confirm('Supprimer ?')"><i class="fas fa-trash"></i></a>
                                 <?php else: ?><span style="color:var(--sa-gray);font-size:11px;">Protégé</span><?php endif; ?>
                             </td>
@@ -85,6 +94,7 @@
                     <option value="agent">Agent</option>
                     <option value="admin">Administrateur</option>
                     <option value="super_admin">Super Admin</option>
+                    <option value="client">Client</option>
                 </select>
             </div>
             <button type="submit" class="sa-btn sa-btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-save"></i> Créer</button>

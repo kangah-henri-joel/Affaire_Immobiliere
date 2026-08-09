@@ -16,13 +16,7 @@
     $companyName = $siteSettings['company_name'] ?? 'ImmoAffaire';
     ?>
 
-    <!-- Bouton WhatsApp Flottant -->
-    <?php if(!empty($cleanWhatsapp)): ?>
-    <a href="https://wa.me/<?php echo $cleanWhatsapp; ?>" class="whatsapp-float" target="_blank" title="Contactez-nous sur WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-        <span>Contactez-nous</span>
-    </a>
-    <?php endif; ?>
+
 
     <footer>
         <div class="container">
@@ -62,40 +56,61 @@
     </footer>
 
     <style>
-    .whatsapp-float {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background-color: #25d366;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 50px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
-        z-index: 9999; /* Assurer qu'il est au-dessus de tout */
-        font-weight: 700;
-        transition: all 0.3s ease;
-        text-decoration: none;
+    /* ── Footer styles ─────────────────────────────────── */
+    footer {
+        background: #0f172a !important;
+        color: #94a3b8 !important;
+        padding: 80px 0 30px !important;
+        margin-top: 80px !important;
+        display: block !important;
+        width: 100% !important;
     }
-    .whatsapp-float:hover {
-        transform: translateY(-5px) scale(1.05);
-        background-color: #128c7e;
-        color: white;
-        box-shadow: 0 15px 30px rgba(37, 211, 102, 0.5);
+    .footer-content {
+        display: grid !important;
+        grid-template-columns: 2fr 1fr 1fr !important;
+        gap: 60px !important;
+    }
+    .footer-section h3 { color: #ffffff !important; margin-bottom: 25px !important; }
+    .footer-section p { color: #94a3b8; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .footer-section ul { list-style: none; padding: 0; }
+    .footer-section ul li { margin-bottom: 10px; }
+    .footer-section ul li a { color: #94a3b8 !important; text-decoration: none; }
+    .footer-section ul li a:hover { color: #f59e0b !important; }
+    .footer-bottom {
+        border-top: 1px solid rgba(255,255,255,0.05) !important;
+        padding-top: 30px !important;
+        text-align: center !important;
+        margin-top: 50px !important;
+        color: #64748b !important;
+    }
+    .social-links-footer { display: flex; gap: 15px; margin-top: 15px; }
+    .social-links-footer a { color: #64748b !important; font-size: 1.2rem; }
+    .social-links-footer a:hover { color: #f59e0b !important; }
+
+    /* ── WhatsApp floating button ───────────────────────── */
+    .whatsapp-float {
+        position: fixed !important;
+        bottom: 30px !important;
+        right: 30px !important;
+        background-color: #25d366 !important;
+        color: white !important;
+        padding: 12px 25px !important;
+        border-radius: 50px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        box-shadow: 0 10px 25px rgba(37,211,102,0.4) !important;
+        z-index: 9999 !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
     }
     .whatsapp-float i { font-size: 1.8rem; }
-    
-    footer { background: var(--primary); color: #94a3b8; padding: 80px 0 30px; margin-top: 80px; }
-    .footer-content { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; }
-    .footer-section h3 { color: white; margin-bottom: 25px; }
-    .footer-bottom { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 30px; text-align: center; margin-top: 50px; }
-    
+
     @media (max-width: 768px) {
-        .footer-content { grid-template-columns: 1fr; gap: 40px; }
-        .whatsapp-float span { display: none; }
-        .whatsapp-float { padding: 15px; bottom: 20px; right: 20px; }
+        footer { padding: 50px 0 20px !important; }
+        .footer-content { grid-template-columns: 1fr !important; gap: 30px !important; }
+        .whatsapp-float span { display: none !important; }
+        .whatsapp-float { padding: 15px !important; bottom: 20px !important; right: 20px !important; border-radius: 50% !important; }
     }
     </style>
 

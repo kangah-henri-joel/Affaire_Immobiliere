@@ -5,16 +5,20 @@ require_once __DIR__ . '/Model.php';
 
 class UserModel extends Model {
     public function getByUsername($username) {
-        $sql = "SELECT * FROM users WHERE username = ?";
-        return $this->fetch($sql, [$username]);
+        $sql = "SELECT * FROM users WHERE username = ? OR email = ?";
+        return $this->fetch($sql, [$username, $username]);
     }
 
     public function verifyLogin($username, $password) {
         $user = $this->getByUsername($username);
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user && password_verify($password, $user['password']) && $user['status'] !== 'pending') {
             return $user;
         }
         return false;
+    }
+
+    public function getAllActiveClientsEmails() {
+        return $this->fetchAll("SELECT email FROM users WHERE role = 'client' AND status = 'active' AND email IS NOT NULL");
     }
 
     public function getAllAgents() {
@@ -30,7 +34,7 @@ class UserModel extends Model {
     }
 
     public function updateRole($id, $role) {
-        $allowed = ['super_admin', 'admin', 'agent'];
+        $allowed = ['super_admin', 'admin', 'agent', 'client'];
         if (!in_array($role, $allowed)) return false;
         return $this->query("UPDATE users SET role = ? WHERE id = ?", [$role, $id]);
     }
@@ -49,13 +53,35 @@ class UserModel extends Model {
     }
 
     public function create($data) {
-        $sql = "INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO users (username, password, full_name, email, country, role, phone_tel) VALUES (?, ?, ?, ?, ?, ?, ?)";
         return $this->query($sql, [
             $data['username'],
             password_hash($data['password'], PASSWORD_BCRYPT),
             $data['full_name'],
-            $data['role'] ?? 'agent'
+            $data['email'] ?? null,
+            $data['country'] ?? null,
+            $data['role'] ?? 'agent',
+            $data['phone_tel'] ?? null
         ]);
+    }
+
+    public function createClient($data) {
+        $data['role'] = 'client';
+        $this->create($data);
+        return $this->db->lastInsertId();
+    }
+
+    public function createAgent($data) {
+        $sql = "INSERT INTO users (username, password, full_name, email, country, role, status, phone_tel) VALUES (?, ?, ?, ?, ?, 'agent', 'pending', ?)";
+        $this->query($sql, [
+            $data['username'],
+            password_hash($data['password'], PASSWORD_BCRYPT),
+            $data['full_name'],
+            $data['email'] ?? null,
+            $data['country'] ?? null,
+            $data['phone_tel'] ?? null
+        ]);
+        return $this->db->lastInsertId();
     }
 
     public function createAdmin($data) {
@@ -68,10 +94,12 @@ class UserModel extends Model {
     }
 
     public function update($id, $data) {
-        $sql = "UPDATE users SET username = ?, full_name = ?, phone_whatsapp = ?, phone_tel = ?, phone_fixe = ? WHERE id = ?";
+        $sql = "UPDATE users SET username = ?, full_name = ?, email = ?, country = ?, phone_whatsapp = ?, phone_tel = ?, phone_fixe = ? WHERE id = ?";
         $params = [
             $data['username'],
             $data['full_name'],
+            $data['email'] ?? null,
+            $data['country'] ?? null,
             $data['phone_whatsapp'] ?? null,
             $data['phone_tel'] ?? null,
             $data['phone_fixe'] ?? null,
@@ -79,10 +107,12 @@ class UserModel extends Model {
         ];
 
         if (!empty($data['password'])) {
-            $sql = "UPDATE users SET username = ?, full_name = ?, phone_whatsapp = ?, phone_tel = ?, phone_fixe = ?, password = ? WHERE id = ?";
+            $sql = "UPDATE users SET username = ?, full_name = ?, email = ?, country = ?, phone_whatsapp = ?, phone_tel = ?, phone_fixe = ?, password = ? WHERE id = ?";
             $params = [
                 $data['username'],
                 $data['full_name'],
+                $data['email'] ?? null,
+                $data['country'] ?? null,
                 $data['phone_whatsapp'] ?? null,
                 $data['phone_tel'] ?? null,
                 $data['phone_fixe'] ?? null,

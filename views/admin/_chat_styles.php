@@ -102,4 +102,15 @@
 
 .alert-info-card { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; gap: 14px; color: #1d4ed8; }
 .alert-info-card i { font-size: 1.5rem; }
+
+@media (max-width: 768px) {
+    .chat-layout { height: calc(100vh - 120px); min-height: 400px; border-radius: 12px; }
+    .chat-header { padding: 12px 14px; }
+    .chat-messages { padding: 14px; gap: 10px; }
+    .bubble-content { max-width: 85%; padding: 10px 12px; }
+    .bubble-content p { font-size: 0.85rem; }
+    .chat-form { padding: 10px 12px; }
+    .chat-input-row textarea { padding: 10px; font-size: 0.85rem; }
+    .chat-send-btn { width: 40px; height: 40px; font-size: 0.9rem; }
+}
 </style>

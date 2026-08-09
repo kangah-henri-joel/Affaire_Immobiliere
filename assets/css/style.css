@@ -154,7 +154,7 @@ header {
     left: 0;
     height: calc(100vh - 80px);
     overflow-y: auto;
-    z-index: 900;
+    z-index: 99999;
 }
 
 .admin-sidebar ul li {
@@ -378,9 +378,9 @@ tr:hover td { background: #fafafa; }
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15,23,42,0.6);
-    z-index: 899;
-    backdrop-filter: blur(3px);
+    background: rgba(15,23,42,0.7);
+    z-index: 99998;
+    backdrop-filter: blur(4px);
 }
 
 .sidebar-overlay.active { display: block; }
@@ -395,14 +395,18 @@ tr:hover td { background: #fafafa; }
     .admin-sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
-        z-index: 900;
+        z-index: 99999 !important;
+        box-shadow: 10px 0 35px rgba(0,0,0,0.4);
     }
 
     .admin-sidebar.open {
         transform: translateX(0);
     }
 
-    .admin-menu-toggle { display: flex; }
+    .admin-menu-toggle {
+        display: flex;
+        z-index: 100000 !important;
+    }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -447,61 +451,109 @@ tr:hover td { background: #fafafa; }
     .hero h1 { font-size: 2rem; }
     .hero p { font-size: 1rem; }
 
-    /* Admin content */
-    .admin-content { padding: 20px 15px; }
+    /* Admin content & Layout */
+    .admin-container {
+        flex-direction: column;
+    }
+    .admin-content {
+        margin-left: 0 !important;
+        padding: 18px 12px !important;
+        width: 100% !important;
+    }
 
-    .admin-header h1 { font-size: 1.4rem; }
+    .admin-header {
+        margin-bottom: 20px;
+    }
+    .admin-header h1 {
+        font-size: 1.35rem;
+        line-height: 1.3;
+    }
+    .admin-header .header-flex,
+    .admin-header > div {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+    .admin-header button, 
+    .admin-header a.btn-primary, 
+    .admin-header a.btn-outline-sm {
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center;
+    }
 
-    /* Stats */
-    .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .stat-card { padding: 18px; }
-    .stat-card i { padding: 12px; font-size: 1.4rem; }
-    .stat-card p { font-size: 1.3rem; }
+    /* Stats Grid */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        margin-bottom: 25px;
+    }
+    .stat-card {
+        padding: 14px !important;
+        border-radius: 14px !important;
+        gap: 12px !important;
+    }
+    .stat-card i {
+        padding: 10px !important;
+        font-size: 1.2rem !important;
+        border-radius: 10px !important;
+    }
+    .stat-card h4 {
+        font-size: 0.78rem !important;
+    }
+    .stat-card p {
+        font-size: 1.1rem !important;
+        margin-top: 2px !important;
+    }
 
-    /* Tables → scroll horizontal */
+    /* Tables → scroll horizontal tactile */
     .table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        border-radius: 12px;
+        margin-bottom: 15px;
     }
+    table { min-width: 620px; }
+    th, td { padding: 10px 8px !important; font-size: 0.82rem !important; }
 
-    table { min-width: 600px; }
-    th, td { padding: 12px 15px; font-size: 0.85rem; }
-
-    /* Modals plein écran */
+    /* Modals plein écran sur mobile */
     .modal-content {
-        margin: 0;
-        width: 100%;
-        min-height: 100vh;
-        border-radius: 0;
-        padding: 25px 20px;
+        margin: 10px auto !important;
+        width: 95% !important;
+        max-width: 100% !important;
+        max-height: 94vh !important;
+        border-radius: 16px !important;
+        padding: 20px 14px !important;
+        overflow-y: auto !important;
     }
 
-    /* Boutons */
-    .btn-primary { padding: 12px 18px; font-size: 0.9rem; }
+    /* Formulaires en 1 seule colonne */
+    .form-grid, .form-grid-2, .form-row-2 {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
 
-    /* Formulaires */
-    .form-grid { grid-template-columns: 1fr !important; }
-    .form-grid-2 { grid-template-columns: 1fr !important; }
+    /* General Grids (Bureau, Profile, Settings) */
+    .bureau-grid, .profile-grid, .settings-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+    .avatar-card { position: static !important; }
 
     /* Footer */
+    footer { padding: 50px 0 20px; }
     .footer-content { grid-template-columns: 1fr !important; gap: 30px; }
     .whatsapp-float span { display: none; }
     .whatsapp-float { padding: 14px; bottom: 20px; right: 20px; border-radius: 50%; }
 
-    /* Annonces grid */
+    /* Grilles et composants */
     .annonce-grid { grid-template-columns: 1fr !important; }
-
-    /* Features */
     .features-grid { grid-template-columns: 1fr !important; gap: 25px; }
 
     /* Section header */
     .section-header-pro { flex-direction: column; align-items: flex-start; gap: 15px; padding-top: 50px; }
     .section-title-pro { font-size: 1.8rem; }
-
-    /* Profil grid */
-    .profile-grid { grid-template-columns: 1fr !important; }
-    .avatar-card { position: static !important; }
-    .form-grid-2 { grid-template-columns: 1fr !important; }
 
     /* Contact rows */
     .contact-field-row { flex-wrap: wrap; }
@@ -512,17 +564,14 @@ tr:hover td { background: #fafafa; }
     .search-group { border-right: none; border-bottom: 1px solid #f1f5f9; }
     .btn-search-pro { padding: 15px; width: 100%; border-radius: 10px; }
     .search-container-glass { padding: 8px; }
-
-    /* Publications / annonces header */
-    .header-flex { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .header-flex button { width: 100%; justify-content: center; }
 }
 
 /* ========== TRES PETIT MOBILE (max 400px) ========== */
 @media (max-width: 400px) {
-    .stats-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr !important; }
     .hero h1 { font-size: 1.7rem; }
     .logo-text { font-size: 1.3rem; }
-    .admin-content { padding: 15px 10px; }
+    .admin-content { padding: 12px 8px !important; }
+    .stat-card { padding: 12px !important; }
 }
 
