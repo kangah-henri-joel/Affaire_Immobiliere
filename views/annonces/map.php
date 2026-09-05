@@ -1,7 +1,7 @@
 <?php include __DIR__ . '/../layout_header.php'; ?>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/lib/leaflet/leaflet.css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/lib/leaflet-markercluster/MarkerCluster.css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/lib/leaflet-markercluster/MarkerCluster.Default.css" />
 
 <section class="map-view-section">
     <div class="map-container-full">
@@ -34,10 +34,20 @@
 
             <!-- Liste des biens -->
             <div class="map-annonce-list" id="annonceList">
-                <?php foreach($annonces as $a): if(!$a['latitude'] || !$a['longitude']) continue; ?>
+                <?php foreach($annonces as $a): if(!$a['latitude'] || !$a['longitude']) continue;
+                    $imgUrl = SiteUrl::media($a['image_path'] ?? null);
+                    $isVideo = ($a['media_type'] ?? 'image') === 'video';
+                ?>
                 <div class="map-annonce-item" data-id="<?php echo $a['id']; ?>" data-type="<?php echo $a['type']; ?>" onclick="flyToAnnonce(<?php echo $a['id']; ?>)">
                     <div class="map-item-img">
-                        <img src="<?php echo BASE_URL . ($a['image_path'] ?? '/assets/images/placeholder.jpg'); ?>" alt="<?php echo htmlspecialchars($a['title']); ?>">
+                        <?php if ($isVideo): ?>
+                            <div class="map-item-video-thumb">
+                                <video src="<?php echo $imgUrl; ?>" autoplay muted loop playsinline></video>
+                                <i class="fas fa-play-circle video-play-icon"></i>
+                            </div>
+                        <?php else: ?>
+                            <img src="<?php echo $imgUrl; ?>" alt="<?php echo htmlspecialchars($a['title']); ?>" loading="lazy" onerror="this.src='<?php echo SiteUrl::media(null); ?>'">
+                        <?php endif; ?>
                     </div>
                     <div class="map-item-info">
                         <strong><?php echo htmlspecialchars($a['title']); ?></strong>
@@ -56,11 +66,21 @@
     </div>
 </section>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="<?php echo BASE_URL; ?>/assets/lib/leaflet/leaflet.js"></script>
+<script src="<?php echo BASE_URL; ?>/assets/lib/leaflet-markercluster/leaflet.markercluster.js"></script>
 <script>
-const annoncesData = <?php echo json_encode(array_values(array_filter($annonces, fn($a) => $a['latitude'] && $a['longitude']))); ?>;
+<?php
+// Préparer les données de la carte avec les URLs d'image complètes via SiteUrl
+$annoncesMapData = array_values(array_filter($annonces, fn($a) => $a['latitude'] && $a['longitude']));
+foreach ($annoncesMapData as &$a) {
+    $a['image_url'] = SiteUrl::media($a['image_path'] ?? null);
+    $a['is_video'] = ($a['media_type'] ?? 'image') === 'video';
+}
+unset($a);
+?>
+const annoncesData = <?php echo json_encode($annoncesMapData); ?>;
 const BASE_URL = '<?php echo BASE_URL; ?>';
+const PLACEHOLDER_URL = '<?php echo SiteUrl::media(null); ?>';
 
 // Map init — centré sur Abidjan
 const map = L.map('global-map', { zoomControl: false }).setView([5.3484, -4.0305], 12);
@@ -110,9 +130,16 @@ const markerMap = {}; // id → marker
 annoncesData.forEach(a => {
     const marker = L.marker([parseFloat(a.latitude), parseFloat(a.longitude)], { icon: makeIcon(a.type) });
 
+    const mediaThumbnail = a.is_video
+        ? `<div style="position:relative;width:100%;height:130px;background:#0f172a;border-radius:8px 8px 0 0;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+               <video src="${a.image_url}" autoplay muted loop playsinline style="width:100%;height:130px;object-fit:cover;display:block;"></video>
+               <i class="fas fa-play-circle" style="position:absolute;font-size:2rem;color:#f59e0b;pointer-events:none;text-shadow:0 2px 4px rgba(0,0,0,0.6);"></i>
+           </div>`
+        : `<img src="${a.image_url}" alt="${a.title}" onerror="this.src='${PLACEHOLDER_URL}'" style="width:100%;height:130px;object-fit:cover;border-radius:8px 8px 0 0;display:block;">`;
+
     const popup = `
         <div class="leaflet-popup-custom">
-            <img src="${BASE_URL}${a.image_path || '/assets/images/placeholder.jpg'}" onerror="this.src='${BASE_URL}/assets/images/placeholder.jpg'">
+            ${mediaThumbnail}
             <div class="popup-body">
                 <span class="popup-type ${a.type}">${a.type === 'vente' ? 'Vente' : 'Location'}</span>
                 <h4>${a.title}</h4>
@@ -179,7 +206,7 @@ function searchLocation() {
     const query = document.getElementById('mapSearchInput').value.trim();
     if (!query) return;
 
-    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=ci`, {
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`, {
         headers: { 'Accept-Language': 'fr', 'User-Agent': 'ImmoAffaire/1.0' }
     })
     .then(r => r.json())
@@ -291,17 +318,17 @@ function goToMyLocation() {
 .map-annonce-list {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 .map-annonce-item {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
-    padding: 10px;
-    border-radius: 12px;
+    padding: 6px 8px;
+    border-radius: 10px;
     cursor: pointer;
     border: 2px solid transparent;
     transition: var(--transition);
@@ -311,8 +338,10 @@ function goToMyLocation() {
     border-color: var(--secondary);
     background: #fffbeb;
 }
-.map-item-img { width: 56px; height: 56px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
-.map-item-img img { width: 100%; height: 100%; object-fit: cover; }
+.map-item-img { width: 56px; height: 56px; border-radius: 8px; overflow: hidden; flex-shrink: 0; position: relative; background: #0f172a; }
+.map-item-img img, .map-item-img video { width: 100%; height: 100%; object-fit: cover; }
+.map-item-video-thumb { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; background: #0f172a; }
+.map-item-video-thumb .video-play-icon { position: absolute; font-size: 1rem; color: #f59e0b; pointer-events: none; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
 .map-item-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .map-item-info strong { font-size: 0.85rem; font-weight: 700; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .map-item-price { font-size: 0.82rem; font-weight: 700; color: var(--secondary); }

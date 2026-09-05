@@ -82,6 +82,9 @@ $routes = [
     'annonce/message' => ['AnnonceController', 'sendClientMessage'],
     'annonce/media/set-main' => ['AnnonceController', 'setMainMedia'],
     'annonce/like' => ['AnnonceController', 'toggleLike'],
+    'demandes' => ['AnnonceController', 'demandes'],
+    'demandes/save' => ['AnnonceController', 'saveDemande'],
+    'demandes/close' => ['AnnonceController', 'closeDemande'],
     'mes-conversations' => ['AnnonceController', 'findConversation'],
     // ── Admin ─────────────────────────────────────────────────────────────────
     'admin' => ['AdminController', 'index'],

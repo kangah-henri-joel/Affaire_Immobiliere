@@ -1,7 +1,7 @@
 <?php include __DIR__ . '/../layout_header.php'; ?>
 
 <!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/lib/leaflet/leaflet.css" />
 
 <?php
 // Rendre global pour la fonction récursive de l'arbre des commentaires
@@ -434,7 +434,7 @@ function renderCommentTree($comments, $parentId = null, $depth = 0) {
 <?php endif; ?>
 
 <!-- Leaflet CSS/JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="<?php echo BASE_URL; ?>/assets/lib/leaflet/leaflet.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     <?php if($annonce['latitude'] && $annonce['longitude']): ?>

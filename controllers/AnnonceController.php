@@ -33,6 +33,10 @@ class AnnonceController extends Controller {
             'price_max' => $_GET['price_max'] ?? '',
             'price_min' => $_GET['price_min'] ?? '',
             'type'      => $_GET['type'] ?? '',
+            'pays'      => $_GET['pays'] ?? '',
+            'ville'     => $_GET['ville'] ?? '',
+            'commune'   => $_GET['commune'] ?? '',
+            'quartier'  => $_GET['quartier'] ?? '',
         ];
         $annonces = $this->model->getAll($filters);
         $this->render('annonces/index', ['annonces' => $annonces, 'title' => 'Toutes les Annonces']);
@@ -301,5 +305,98 @@ class AnnonceController extends Controller {
             echo json_encode(['error' => 'La table likes n\'existe pas encore. Créez-la dans PhpMyAdmin.']);
         }
         exit;
+    }
+
+    // ── DEMANDES CLIENT ────────────────────────────────────────────────────
+
+    /** Page publique : liste des demandes actives + formulaire (si connecté) */
+    public function demandes() {
+        $demandeModel = new DemandeModel();
+        $filters = [
+            'category' => $_GET['category'] ?? '',
+            'type'     => $_GET['type'] ?? '',
+            'pays'     => $_GET['pays'] ?? '',
+            'ville'    => $_GET['ville'] ?? '',
+        ];
+        $demandes = $demandeModel->getActive($filters);
+
+        // Si le client est connecté, récupérer ses propres demandes
+        $mesDemandes = [];
+        if (!empty($_SESSION['user_id'])) {
+            $mesDemandes = $demandeModel->getByUserId($_SESSION['user_id']);
+        }
+
+        $this->render('annonces/demandes', [
+            'title'       => 'Demandes de biens',
+            'demandes'    => $demandes,
+            'mesDemandes' => $mesDemandes,
+            'success'     => $_GET['success'] ?? null,
+        ]);
+    }
+
+    /** Enregistrer une nouvelle demande (POST, inscription requise) */
+    public function saveDemande() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/demandes');
+        }
+
+        // Vérifier que l'utilisateur est connecté
+        if (empty($_SESSION['user_id'])) {
+            $this->redirect('/login');
+        }
+
+        $description = trim($_POST['description'] ?? '');
+        $clientPhone = trim($_POST['client_phone'] ?? '');
+
+        if (empty($description) || empty($clientPhone)) {
+            echo "<script>alert('Veuillez remplir la description et le numéro de téléphone.'); window.history.back();</script>";
+            return;
+        }
+
+        $demandeModel = new DemandeModel();
+        $demandeModel->create([
+            'user_id'      => (int)$_SESSION['user_id'],
+            'client_name'  => $_SESSION['full_name'] ?? $_SESSION['username'] ?? 'Client',
+            'client_phone' => $clientPhone,
+            'category'     => $_POST['category'] ?? null,
+            'type'         => $_POST['type'] ?? 'achat',
+            'budget_max'   => $_POST['budget_max'] ?? null,
+            'pays'         => $_POST['pays'] ?? null,
+            'ville'        => $_POST['ville'] ?? null,
+            'commune'      => $_POST['commune'] ?? null,
+            'quartier'     => $_POST['quartier'] ?? null,
+            'description'  => $description,
+        ]);
+
+        $this->redirect('/demandes?success=created');
+    }
+
+    /** Clôturer/retirer une demande (POST, seul le propriétaire ou admin) */
+    public function closeDemande() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/demandes');
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            $this->redirect('/login');
+        }
+
+        $demandeId = (int)($_POST['demande_id'] ?? 0);
+        if (!$demandeId) {
+            $this->redirect('/demandes');
+        }
+
+        $demandeModel = new DemandeModel();
+        $role = $_SESSION['user_role'] ?? '';
+
+        // Admin / Super-admin peuvent supprimer n'importe quelle demande
+        if (in_array($role, ['admin', 'super_admin'])) {
+            $demandeModel->delete($demandeId);
+        } else {
+            // Le client ne peut retirer que ses propres demandes
+            $demandeModel->close($demandeId, (int)$_SESSION['user_id']);
+        }
+
+        $this->redirect('/demandes?success=closed');
     }
 }

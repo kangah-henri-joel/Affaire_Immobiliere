@@ -10,7 +10,7 @@ class AnnonceModel extends Model {
                        u.phone_tel as author_phone, u.avatar as author_avatar
                 FROM annonces a 
                 JOIN categories c ON a.category_id = c.id 
-                LEFT JOIN images i ON i.annonce_id = a.id AND i.is_main = 1
+                LEFT JOIN images i ON i.id = (SELECT id FROM images WHERE annonce_id = a.id ORDER BY is_main DESC, id ASC LIMIT 1)
                 LEFT JOIN users u ON a.user_id = u.id
                 WHERE a.deleted_at IS NULL";
         $params = [];
@@ -54,9 +54,32 @@ class AnnonceModel extends Model {
         }
 
         if (!empty($filters['query'])) {
-            $sql .= " AND (a.title LIKE ? OR a.location_name LIKE ?)";
+            $sql .= " AND (a.title LIKE ? OR a.location_name LIKE ? OR a.ville LIKE ? OR a.commune LIKE ? OR a.quartier LIKE ?)";
             $params[] = "%{$filters['query']}%";
             $params[] = "%{$filters['query']}%";
+            $params[] = "%{$filters['query']}%";
+            $params[] = "%{$filters['query']}%";
+            $params[] = "%{$filters['query']}%";
+        }
+
+        if (!empty($filters['pays'])) {
+            $sql .= " AND a.pays LIKE ?";
+            $params[] = "%{$filters['pays']}%";
+        }
+
+        if (!empty($filters['ville'])) {
+            $sql .= " AND a.ville LIKE ?";
+            $params[] = "%{$filters['ville']}%";
+        }
+
+        if (!empty($filters['commune'])) {
+            $sql .= " AND a.commune LIKE ?";
+            $params[] = "%{$filters['commune']}%";
+        }
+
+        if (!empty($filters['quartier'])) {
+            $sql .= " AND a.quartier LIKE ?";
+            $params[] = "%{$filters['quartier']}%";
         }
 
         $sql .= " ORDER BY a.created_at DESC";
@@ -76,7 +99,7 @@ class AnnonceModel extends Model {
         $sql = "SELECT a.*, c.name as category_name, i.file_path as image_path, i.media_type
                 FROM annonces a
                 JOIN categories c ON a.category_id = c.id
-                LEFT JOIN images i ON i.annonce_id = a.id AND i.is_main = 1
+                LEFT JOIN images i ON i.id = (SELECT id FROM images WHERE annonce_id = a.id ORDER BY is_main DESC, id ASC LIMIT 1)
                 WHERE a.deleted_at IS NOT NULL";
         $params = [];
         if ($userId !== null) {
@@ -118,7 +141,7 @@ class AnnonceModel extends Model {
                        u.phone_tel as author_phone, u.avatar as author_avatar, u.username as author_username
                 FROM annonces a 
                 JOIN categories c ON a.category_id = c.id 
-                LEFT JOIN images i ON i.annonce_id = a.id AND i.is_main = 1
+                LEFT JOIN images i ON i.id = (SELECT id FROM images WHERE annonce_id = a.id ORDER BY is_main DESC, id ASC LIMIT 1)
                 LEFT JOIN users u ON a.user_id = u.id
                 WHERE a.id = ?";
         return $this->fetch($sql, [$id]);
@@ -129,8 +152,8 @@ class AnnonceModel extends Model {
     }
 
     public function create($data) {
-        $sql = "INSERT INTO annonces (user_id, published_by, category_id, title, description, price, type, location_name, latitude, longitude, whatsapp_contact, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO annonces (user_id, published_by, category_id, title, description, price, type, location_name, pays, ville, commune, quartier, latitude, longitude, whatsapp_contact, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $this->query($sql, [
             $data['user_id'] ?? null,
             $data['published_by'] ?? null,
@@ -139,9 +162,13 @@ class AnnonceModel extends Model {
             $data['description'],
             $data['price'],
             $data['type'],
-            $data['location_name'],
-            $data['latitude'],
-            $data['longitude'],
+            $data['location_name'] ?? null,
+            $data['pays'] ?? null,
+            $data['ville'] ?? null,
+            $data['commune'] ?? null,
+            $data['quartier'] ?? null,
+            $data['latitude'] ?? null,
+            $data['longitude'] ?? null,
             $data['whatsapp_contact'],
             $data['status'] ?? 'disponible'
         ]);

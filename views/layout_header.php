@@ -33,9 +33,21 @@ $companyName = $siteSettings['company_name'] ?? 'ImmoAffaire';
         <meta property="og:description" content="<?php echo $companyName; ?> - Votre partenaire immobilier de confiance.">
     <?php endif; ?>
 
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Préconnexion CDN pour réduire la latence DNS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/style.css?v=<?php echo @filemtime(__DIR__ . '/../assets/css/style.css') ?: 1; ?>">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/ux-helpers.css?v=<?php echo @filemtime(__DIR__ . '/../assets/css/ux-helpers.css') ?: 1; ?>">
+
+    <!-- Font Awesome en différé (non bloquant) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Google Fonts en différé (non bloquant) -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet"></noscript>
 </head>
 <body>
     <header>
@@ -55,11 +67,15 @@ $companyName = $siteSettings['company_name'] ?? 'ImmoAffaire';
                 <ul class="nav-links" id="nav-links">
                     <li><a href="<?php echo BASE_URL; ?>/">Accueil</a></li>
                     <li><a href="<?php echo BASE_URL; ?>/annonces">Annonces</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>/demandes">Demandes</a></li>
                     <li><a href="<?php echo BASE_URL; ?>/annonces/map">Carte</a></li>
                     <li><a href="<?php echo BASE_URL; ?>/contact">Contact</a></li>
                     
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li><a href="<?php echo BASE_URL; ?>/admin" class="btn-admin-nav"><i class="fas fa-lock"></i> Admin</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>/logout" class="btn-nav-logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+                    <?php else: ?>
+                        <li><a href="<?php echo BASE_URL; ?>/login" class="btn-nav-login"><i class="fas fa-user"></i> Connexion</a></li>
                     <?php endif; ?>
                 </ul>
 

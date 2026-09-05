@@ -114,6 +114,8 @@
     }
     </style>
 
+    <script src="<?php echo BASE_URL; ?>/assets/js/africa-locations.js"></script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/ux-helpers.js?v=<?php echo @filemtime(__DIR__ . '/../assets/js/ux-helpers.js') ?: time(); ?>"></script>
     <script src="<?php echo BASE_URL; ?>/assets/js/main.js"></script>
 </body>
 </html>

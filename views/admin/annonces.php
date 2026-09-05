@@ -1,5 +1,5 @@
 <?php include __DIR__ . '/../layout_header.php'; ?>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/lib/leaflet/leaflet.css" />
 
 <div class="admin-container">
     <?php include __DIR__ . '/sidebar.php'; ?>
@@ -174,6 +174,36 @@
                 </div>
             </div>
 
+            <!-- Localisation administrative (pays / ville / commune / quartier) -->
+            <div class="geo-admin-grid">
+                <div class="geo-admin-header">
+                    <i class="fas fa-map-marker-alt"></i> Localisation administrative
+                    <span class="geo-admin-note">Ces informations permettent aux visiteurs de filtrer les annonces par zone</span>
+                </div>
+                <div class="geo-admin-fields">
+                    <div class="form-group">
+                        <label><i class="fas fa-globe-africa"></i> Pays</label>
+                        <input type="text" name="pays" list="admin-list-pays" placeholder="Ex: Côte d'Ivoire">
+                        <datalist id="admin-list-pays"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-city"></i> Ville</label>
+                        <input type="text" name="ville" list="admin-list-villes" placeholder="Ex: Abidjan">
+                        <datalist id="admin-list-villes"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-map"></i> Commune</label>
+                        <input type="text" name="commune" list="admin-list-communes" placeholder="Ex: Cocody">
+                        <datalist id="admin-list-communes"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-map-pin"></i> Quartier</label>
+                        <input type="text" name="quartier" list="admin-list-quartiers" placeholder="Ex: Angré, Riviera...">
+                        <datalist id="admin-list-quartiers"></datalist>
+                    </div>
+                </div>
+            </div>
+
             <!-- Localisation géographique précise -->
             <div class="form-group geo-section" style="margin-top: 10px;">
                 <label><i class="fas fa-map-marker-alt" style="color:var(--danger);"></i> Localisation géographique précise</label>
@@ -239,6 +269,38 @@
 .geo-status { font-size: 0.8rem; margin: 4px 0 8px; min-height: 18px; }
 .geo-status.ok { color: #059669; } .geo-status.err { color: #dc2626; } .geo-status.loading { color: #6366f1; }
 
+/* Grille localisation administrative */
+.geo-admin-grid {
+    background: linear-gradient(135deg, #f8faff 0%, #eff6ff 100%);
+    border: 1.5px solid #dbeafe;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+}
+.geo-admin-header {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.geo-admin-header i { color: #6366f1; }
+.geo-admin-note {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-left: 4px;
+}
+.geo-admin-fields {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+.geo-admin-fields .form-group label i { color: #6366f1; margin-right: 5px; font-size: 0.78rem; }
+
 /* Custom badges and visual highlights */
 .badge-type { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
 .badge-type.vente { background: #fee2e2; color: #dc2626; }
@@ -300,6 +362,7 @@
     .geo-search-input-wrap { width: 100%; padding: 0 10px; }
     .btn-geo-search, .btn-geo-me { width: 100%; height: 42px; justify-content: center; font-size: 0.88rem; }
     #map-picker { height: 230px !important; }
+    .geo-admin-fields { grid-template-columns: 1fr 1fr !important; gap: 10px; }
 
     /* Modal Submit buttons */
     #addAnnonceModal form > div[style*="grid-template-columns"] {
@@ -327,7 +390,7 @@
 }
 </style>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="<?php echo BASE_URL; ?>/assets/lib/leaflet/leaflet.js"></script>
 <script>
     let map, marker;
 
@@ -380,7 +443,11 @@
         status.className = 'geo-status loading';
         status.textContent = '🔍 Recherche en cours...';
 
-        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Côte d\'Ivoire')}&format=json&limit=1`, {
+        const paysInput = document.querySelector('#addAnnonceModal input[name="pays"]');
+        const paysVal = paysInput ? paysInput.value.trim() : '';
+        const searchQuery = paysVal ? `${query}, ${paysVal}` : query;
+
+        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=1`, {
             headers: { 'Accept-Language': 'fr', 'User-Agent': 'ImmoAffaire/1.0' }
         })
         .then(r => r.json())

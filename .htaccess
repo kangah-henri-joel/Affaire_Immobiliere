@@ -3,3 +3,66 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [L,QSA]
+
+# ── COMPRESSION GZIP ─────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml text/xml
+</IfModule>
+
+# ── MISE EN CACHE NAVIGATEUR ──────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # CSS & JavaScript → 1 mois
+    ExpiresByType text/css                  "access plus 1 month"
+    ExpiresByType application/javascript    "access plus 1 month"
+    ExpiresByType text/javascript           "access plus 1 month"
+
+    # Images → 3 mois
+    ExpiresByType image/jpeg                "access plus 3 months"
+    ExpiresByType image/png                 "access plus 3 months"
+    ExpiresByType image/webp                "access plus 3 months"
+    ExpiresByType image/gif                 "access plus 3 months"
+    ExpiresByType image/svg+xml             "access plus 3 months"
+    ExpiresByType image/x-icon              "access plus 1 year"
+
+    # Polices → 1 an
+    ExpiresByType font/woff                 "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+    ExpiresByType application/font-woff     "access plus 1 year"
+
+    # HTML / PHP → pas de cache (contenu dynamique)
+    ExpiresByType text/html                 "access plus 0 seconds"
+</IfModule>
+
+# ── CACHE-CONTROL HEADERS ─────────────────────────────────────
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+        Header set Cache-Control "public, max-age=7776000"
+    </FilesMatch>
+    <FilesMatch "\.(woff|woff2)$">
+        Header set Cache-Control "public, max-age=31536000"
+    </FilesMatch>
+
+    # Sécurité HTTP
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── KEEP-ALIVE (réutilisation connexion TCP) ──────────────────
+<IfModule mod_headers.c>
+    Header set Connection keep-alive
+</IfModule>
+
+# ── DÉSACTIVER ETag (éviter requêtes inutiles) ────────────────
+<IfModule mod_headers.c>
+    Header unset ETag
+</IfModule>
+FileETag None

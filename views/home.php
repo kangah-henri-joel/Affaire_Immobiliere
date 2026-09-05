@@ -18,9 +18,25 @@
                                 <option value="vehicule">Véhicules</option>
                             </select>
                         </div>
+                        <div class="search-group search-geo">
+                            <i class="fas fa-globe-africa"></i>
+                            <input type="text" name="pays" id="heroPays" list="hero-pays" placeholder="Pays...">
+                            <datalist id="hero-pays"></datalist>
+                        </div>
+                        <div class="search-group search-geo">
+                            <i class="fas fa-city"></i>
+                            <input type="text" name="ville" id="heroVille" list="hero-villes" placeholder="Ville...">
+                            <datalist id="hero-villes"></datalist>
+                        </div>
+                        <div class="search-group search-geo">
+                            <i class="fas fa-map"></i>
+                            <input type="text" name="commune" id="heroCommune" list="hero-communes" placeholder="Commune...">
+                            <datalist id="hero-communes"></datalist>
+                        </div>
                         <div class="search-group flex-grow">
                             <i class="fas fa-search"></i>
-                            <input type="text" name="query" placeholder="Ville, quartier ou mot-clé...">
+                            <input type="text" name="quartier" id="heroQuartier" list="hero-quartiers" placeholder="Quartier ou mot-clé...">
+                            <datalist id="hero-quartiers"></datalist>
                         </div>
                         <button type="submit" class="btn-search-pro">Rechercher</button>
                     </form>
@@ -113,19 +129,21 @@
                             else echo strtolower($annonce['category_name']);
                          ?>">
                         <div class="card-img-pro">
-                            <?php if (($annonce['media_type'] ?? 'image') === 'video'): ?>
-                                <div class="video-preview-placeholder">
-                                    <i class="fas fa-play-circle"></i>
-                                    <span>Vidéo</span>
-                                </div>
-                            <?php else: ?>
-                                <img src="<?php echo BASE_URL . ($annonce['image_path'] ?? '/assets/images/placeholder.jpg'); ?>" alt="<?php echo $annonce['title']; ?>">
-                            <?php endif; ?>
+                            <a href="<?php echo BASE_URL; ?>/annonce/<?php echo $annonce['id']; ?>" style="display:block;width:100%;height:100%;">
+                                <?php if (($annonce['media_type'] ?? 'image') === 'video'): ?>
+                                    <div class="video-preview-placeholder">
+                                        <i class="fas fa-play-circle"></i>
+                                        <span>Vidéo</span>
+                                    </div>
+                                <?php else: ?>
+                                    <img src="<?php echo BASE_URL . ($annonce['image_path'] ?? '/assets/images/placeholder.jpg'); ?>" alt="<?php echo htmlspecialchars($annonce['title']); ?>">
+                                <?php endif; ?>
+                            </a>
                             <div class="badge-price-pro"><?php echo number_format($annonce['price'], 0, ',', ' '); ?> FCFA</div>
                         </div>
                         <div class="card-body-pro">
                             <span class="category-label"><?php echo $annonce['category_name']; ?></span>
-                            <h3><?php echo $annonce['title']; ?></h3>
+                            <h3><a href="<?php echo BASE_URL; ?>/annonce/<?php echo $annonce['id']; ?>" style="color:inherit;text-decoration:none;"><?php echo htmlspecialchars($annonce['title']); ?></a></h3>
                             <p class="location-pro"><i class="fas fa-map-marker-alt"></i> <?php echo $annonce['location_name']; ?></p>
                             <div class="card-footer-pro">
                                 <span class="status-tag"><?php echo ucfirst($annonce['type']); ?></span>
@@ -238,6 +256,11 @@
     border-right: 1px solid #f1f5f9;
 }
 
+.search-group.search-geo {
+    min-width: 130px;
+    max-width: 160px;
+}
+
 .search-group i { color: var(--secondary); margin-right: 10px; }
 .search-group select, .search-group input { border: none; padding: 15px 0; outline: none; width: 100%; font-family: inherit; font-size: 1rem; }
 .flex-grow { flex-grow: 1; }
@@ -252,59 +275,76 @@
     cursor: pointer;
 }
 
-.pro-features { padding: 80px 0; background: white; border-bottom: 1px solid var(--border); }
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+.pro-features { padding: 30px 0; background: white; border-bottom: 1px solid var(--border); }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .feature-item { text-align: center; }
-.feat-icon { font-size: 2.5rem; color: var(--secondary); margin-bottom: 20px; }
-.feature-item h3 { margin-bottom: 10px; font-weight: 700; }
-.feature-item p { color: var(--gray); }
+.feat-icon { font-size: 2rem; color: var(--secondary); margin-bottom: 10px; }
+.feature-item h3 { margin-bottom: 5px; font-weight: 700; font-size: 1.05rem; }
+.feature-item p { color: var(--gray); font-size: 0.9rem; }
 
-.section-header-pro { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; padding-top: 80px; }
+.section-header-pro { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; padding-top: 30px; }
 .section-title-pro { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; }
 
-.annonce-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; }
+.annonce-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 
 .annonce-card-pro {
     background: white;
-    border-radius: 20px;
+    border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-.annonce-card-pro:hover { transform: translateY(-10px); }
+.annonce-card-pro:hover { transform: translateY(-3px); }
 
-.card-img-pro { position: relative; height: 170px; }
+.card-img-pro { position: relative; height: 135px; flex-shrink: 0; }
 .card-img-pro img { width: 100%; height: 100%; object-fit: cover; }
 .video-preview-placeholder {
     width: 100%; height: 100%; background: #0f172a;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    color: white; gap: 10px;
+    color: white; gap: 5px;
 }
-.video-preview-placeholder i { font-size: 3rem; color: var(--secondary); }
+.video-preview-placeholder i { font-size: 2rem; color: var(--secondary); }
 .badge-price-pro {
     position: absolute;
-    bottom: 12px;
-    left: 12px;
+    bottom: 8px;
+    left: 8px;
     background: var(--primary);
     color: white;
-    padding: 6px 14px;
-    border-radius: 10px;
+    padding: 4px 10px;
+    border-radius: 8px;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 0.78rem;
+    white-space: nowrap;
 }
 
-.card-body-pro { padding: 16px; }
-.category-label { color: var(--secondary); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-.card-body-pro h3 { font-size: 1.05rem; margin: 6px 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.location-pro { color: var(--gray); margin-bottom: 12px; font-size: 0.82rem; }
+.card-body-pro { padding: 10px 12px; display: flex; flex-direction: column; flex-grow: 1; }
+.category-label { color: var(--secondary); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.8px; }
+.card-body-pro h3 {
+    font-size: 0.92rem;
+    margin: 4px 0;
+    font-weight: 700;
+    line-height: 1.25;
+    height: 2.5em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+.location-pro { color: var(--gray); margin-bottom: 6px; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .card-footer-pro {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid #f1f5f9;
-    padding-top: 20px;
+    padding-top: 8px;
+    margin-top: auto;
 }
 
 .status-tag { background: #f8fafc; padding: 5px 15px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; color: var(--primary); }
@@ -397,18 +437,91 @@
 @media (max-width: 1024px) {
     .annonce-grid { grid-template-columns: repeat(4, 1fr) !important; }
 }
+
 @media (max-width: 768px) {
-    .features-grid { grid-template-columns: 1fr; }
-    .search-form-pro { flex-direction: column; }
-    .search-group { border-right: none; border-bottom: 1px solid #f1f5f9; }
-    .btn-search-pro { padding: 15px; width: 100%; }
-    .annonce-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-    .card-img-pro { height: 120px !important; }
-    .card-body-pro { padding: 8px !important; }
-    .card-body-pro h3 { font-size: 0.78rem !important; }
-    .location-pro { font-size: 0.68rem !important; margin-bottom: 6px !important; }
-    .badge-price-pro { font-size: 0.65rem !important; padding: 3px 7px !important; }
+    /* Hero */
+    .hero { padding: 60px 0 40px !important; min-height: unset !important; }
+    .hero-content { text-align: center; }
+    .hero-content h1 { font-size: 1.6rem !important; line-height: 1.3; margin-bottom: 12px; }
+    .hero-content > p { font-size: 0.95rem !important; margin-bottom: 20px; }
+
+    /* Barre de recherche : tout afficher en colonne sur mobile */
+    .search-wrapper { padding: 0 12px; }
+    .search-container-glass { padding: 8px; border-radius: 16px; }
+    .search-form-pro {
+        flex-direction: column;
+        gap: 0;
+        border-radius: 12px;
+    }
+    .search-group {
+        border-right: none;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 10px 14px;
+    }
+    .search-group:last-of-type { border-bottom: none; }
+    /* Afficher les champs géo sur mobile (pas les cacher) */
+    .search-group.search-geo {
+        display: flex !important;
+        min-width: unset;
+        max-width: unset;
+    }
+    .search-group select,
+    .search-group input { font-size: 0.95rem; padding: 10px 0; }
+    .btn-search-pro { padding: 14px; width: 100%; border-radius: 10px; font-size: 1rem; }
+
+    /* Section avantages */
+    .pro-features { padding: 20px 0 !important; }
+    .features-grid { grid-template-columns: 1fr; gap: 16px !important; }
+    .feat-icon { font-size: 1.75rem !important; margin-bottom: 6px !important; }
+    .feature-item h3 { font-size: 0.95rem !important; margin-bottom: 3px !important; }
+    .feature-item p { font-size: 0.82rem !important; }
+
+    /* Section header opportunités */
+    .section-header-pro {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding-top: 20px !important;
+        margin-bottom: 15px !important;
+    }
+    .section-title-pro { font-size: 1.5rem !important; margin-bottom: 4px; }
+    .section-header-pro > p { font-size: 0.85rem; }
+    .btn-outline-pro { align-self: flex-start; }
+
+    /* Filtres */
+    .smart-filter-wrap { padding: 14px; gap: 10px; margin-bottom: 20px; border-radius: 14px; }
+    .smart-filter-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .smart-btn { padding: 7px 13px; font-size: 0.8rem; }
+
+    /* Grille annonces */
+    .annonce-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+    .annonce-card-pro { border-radius: 10px; height: 100%; display: flex; flex-direction: column; }
+    .card-img-pro { height: 95px !important; flex-shrink: 0; }
+    .card-body-pro { padding: 6px 6px !important; display: flex; flex-direction: column; flex-grow: 1; }
+    .card-body-pro h3 {
+        font-size: 0.75rem !important;
+        line-height: 1.2 !important;
+        height: 2.4em !important;
+        margin: 2px 0 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-break: break-word !important;
+    }
+    .location-pro { font-size: 0.68rem !important; margin-bottom: 2px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .badge-price-pro { font-size: 0.65rem !important; padding: 3px 6px !important; bottom: 6px; left: 6px; }
+    .card-footer-pro { padding-top: 4px !important; margin-top: auto; }
+    .status-tag { font-size: 0.68rem; padding: 3px 8px; }
+    .btn-link-pro { font-size: 0.72rem; }
     .card-agent-strip { display: none !important; }
+}
+
+@media (max-width: 400px) {
+    .hero-content h1 { font-size: 1.35rem !important; }
+    .annonce-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; }
+    .card-img-pro { height: 85px !important; }
 }
 </style>
 
