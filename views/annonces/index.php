@@ -1,11 +1,24 @@
-<?php include __DIR__ . '/../layout_header.php'; ?>
+<?php 
+include __DIR__ . '/../layout_header.php'; 
+$geoPresets = AnnonceModel::getPresetLocations();
+?>
 
 <section class="annonces-list">
     <div class="container">
         <h1 class="section-title"><?php echo $title; ?></h1>
         
         <!-- Smart Filter 2 niveaux -->
+        <!-- Smart Filter 2 niveaux avec recherche libre -->
         <div class="smart-filter-wrap">
+            <!-- Barre de recherche instantanée directe -->
+            <div class="smart-filter-search-row">
+                <div class="smart-filter-search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="listLiveSearch" placeholder="Rechercher librement parmi ces annonces (titre, mot-clé, quartier, prix...)" value="<?php echo htmlspecialchars($_GET['query'] ?? ''); ?>" oninput="applyFilter('list')" autocomplete="off">
+                    <button type="button" class="btn-clear-search" id="clearListSearch" onclick="clearLiveSearch('list')" style="<?php echo empty($_GET['query']) ? 'display:none;' : ''; ?>" title="Effacer"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
             <div class="smart-filter-row">
                 <span class="filter-label">Type :</span>
                 <div class="smart-filter-group" id="typeFilterList">
@@ -43,14 +56,36 @@
 
         <div class="filter-bar">
             <form action="<?php echo BASE_URL; ?>/annonces" method="GET" id="filterForm">
+                <!-- Champ de recherche libre global -->
+                <div class="filter-search-main-row">
+                    <div class="filter-search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="query" placeholder="Que recherchez-vous ? (ex : Villa duplex Cocody, Terrain avec ACD, Mercedes...)" value="<?php echo htmlspecialchars($_GET['query'] ?? ''); ?>">
+                        <?php if (!empty($_GET['query'])): ?>
+                            <a href="<?php echo BASE_URL; ?>/annonces" class="filter-clear-query" title="Effacer"><i class="fas fa-times"></i></a>
+                        <?php endif; ?>
+                    </div>
+                    <button type="submit" class="btn-filter-submit"><i class="fas fa-search"></i> Filtrer</button>
+                </div>
+
                 <div class="filter-row-top">
                     <div class="filter-group">
                         <label><i class="fas fa-th-large"></i> Catégorie</label>
                         <select name="category" onchange="this.form.submit()">
                             <option value="">Toutes</option>
-                            <option value="terrain" <?php echo (($_GET['category'] ?? '') === 'terrain') ? 'selected' : ''; ?>>Terrains</option>
-                            <option value="maison" <?php echo (($_GET['category'] ?? '') === 'maison') ? 'selected' : ''; ?>>Maisons</option>
-                            <option value="vehicule" <?php echo (in_array(($_GET['category'] ?? ''), ['vehicule', 'engins'])) ? 'selected' : ''; ?>>Véhicules</option>
+                            <?php if (!empty($categories)): ?>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?php echo htmlspecialchars($cat['slug']); ?>" <?php echo (($_GET['category'] ?? '') === $cat['slug']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($cat['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="terrain" <?php echo (($_GET['category'] ?? '') === 'terrain') ? 'selected' : ''; ?>>Terrains</option>
+                                <option value="maison" <?php echo (($_GET['category'] ?? '') === 'maison') ? 'selected' : ''; ?>>Maisons</option>
+                                <option value="studio" <?php echo (($_GET['category'] ?? '') === 'studio') ? 'selected' : ''; ?>>Studios</option>
+                                <option value="magasin" <?php echo (($_GET['category'] ?? '') === 'magasin') ? 'selected' : ''; ?>>Magasins</option>
+                                <option value="vehicule" <?php echo (in_array(($_GET['category'] ?? ''), ['vehicule', 'engins'])) ? 'selected' : ''; ?>>Véhicules</option>
+                            <?php endif; ?>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -75,31 +110,39 @@
                     <div class="filter-row-geo">
                         <div class="filter-group">
                             <label><i class="fas fa-globe-africa"></i> Pays</label>
-                            <input type="text" name="pays" id="filterPays" list="list-pays"
-                                   placeholder="Ex: Côte d'Ivoire"
-                                   value="<?php echo htmlspecialchars($_GET['pays'] ?? ''); ?>">
-                            <datalist id="list-pays"></datalist>
+                            <select name="pays" id="filterPays" data-value="<?php echo htmlspecialchars($_GET['pays'] ?? ''); ?>">
+                                <option value="">Tous les pays</option>
+                                <?php foreach ($geoPresets['pays'] as $p): ?>
+                                    <option value="<?php echo htmlspecialchars($p); ?>" <?php echo (($_GET['pays'] ?? '') === $p) ? 'selected' : ''; ?>><?php echo htmlspecialchars($p); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label><i class="fas fa-city"></i> Ville</label>
-                            <input type="text" name="ville" id="filterVille" list="list-villes"
-                                   placeholder="Ex: Abidjan"
-                                   value="<?php echo htmlspecialchars($_GET['ville'] ?? ''); ?>">
-                            <datalist id="list-villes"></datalist>
+                            <select name="ville" id="filterVille" data-value="<?php echo htmlspecialchars($_GET['ville'] ?? ''); ?>">
+                                <option value="">Toutes les villes</option>
+                                <?php foreach ($geoPresets['villes'] as $v): ?>
+                                    <option value="<?php echo htmlspecialchars($v); ?>" <?php echo (($_GET['ville'] ?? '') === $v) ? 'selected' : ''; ?>><?php echo htmlspecialchars($v); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label><i class="fas fa-map"></i> Commune</label>
-                            <input type="text" name="commune" id="filterCommune" list="list-communes"
-                                   placeholder="Ex: Cocody"
-                                   value="<?php echo htmlspecialchars($_GET['commune'] ?? ''); ?>">
-                            <datalist id="list-communes"></datalist>
+                            <select name="commune" id="filterCommune" data-value="<?php echo htmlspecialchars($_GET['commune'] ?? ''); ?>">
+                                <option value="">Toutes les communes</option>
+                                <?php foreach ($geoPresets['communes'] as $com): ?>
+                                    <option value="<?php echo htmlspecialchars($com); ?>" <?php echo (($_GET['commune'] ?? '') === $com) ? 'selected' : ''; ?>><?php echo htmlspecialchars($com); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label><i class="fas fa-map-pin"></i> Quartier</label>
-                            <input type="text" name="quartier" id="filterQuartier" list="list-quartiers"
-                                   placeholder="Ex: Angré, Riviera..."
-                                   value="<?php echo htmlspecialchars($_GET['quartier'] ?? ''); ?>">
-                            <datalist id="list-quartiers"></datalist>
+                            <select name="quartier" id="filterQuartier" data-value="<?php echo htmlspecialchars($_GET['quartier'] ?? ''); ?>">
+                                <option value="">Tous les quartiers</option>
+                                <?php foreach ($geoPresets['quartiers'] as $q): ?>
+                                    <option value="<?php echo htmlspecialchars($q); ?>" <?php echo (($_GET['quartier'] ?? '') === $q) ? 'selected' : ''; ?>><?php echo htmlspecialchars($q); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -257,7 +300,7 @@
 .filter-group label i { color: #6366f1; font-size: 0.74rem; }
 .filter-group select,
 .filter-group input {
-    padding: 8px 12px;
+    padding: 9px 12px;
     border: 1.5px solid #e2e8f0;
     border-radius: 9px;
     font-family: inherit;
@@ -266,6 +309,18 @@
     background: white;
     transition: border-color 0.2s, box-shadow 0.2s;
     outline: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+.filter-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 15px 15px;
+    padding-right: 30px;
+    appearance: none;
+    -webkit-appearance: none;
 }
 .filter-group select:focus,
 .filter-group input:focus {
@@ -609,15 +664,143 @@
     .annonce-info h3 { font-size: 0.72rem !important; }
     .price { font-size: 0.78rem !important; }
 }
+
+/* Recherche principale dans filter-bar */
+.filter-search-main-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.filter-search-box {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0 16px;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+.filter-search-box:focus-within {
+    background: white;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+.filter-search-box i { color: var(--secondary); font-size: 1.1rem; }
+.filter-search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    padding: 12px 0;
+    font-size: 0.98rem;
+    font-family: inherit;
+    color: #1e293b;
+    font-weight: 500;
+}
+.filter-clear-query {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 4px;
+}
+.filter-clear-query:hover { color: #ef4444; }
+.btn-filter-submit {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+.btn-filter-submit:hover {
+    background: #1e293b;
+}
+
+/* Barre de recherche instantanée directe dans smart-filter */
+.smart-filter-search-row {
+    width: 100%;
+}
+.smart-filter-search-box {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 10px 18px;
+    gap: 12px;
+    transition: all 0.25s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+.smart-filter-search-box:focus-within {
+    background: white;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+}
+.smart-filter-search-box i {
+    color: var(--secondary);
+    font-size: 1.1rem;
+}
+.smart-filter-search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.98rem;
+    color: #0f172a;
+    font-weight: 500;
+}
+.smart-filter-search-box input::placeholder {
+    color: #94a3b8;
+}
+.btn-clear-search {
+    background: #e2e8f0;
+    border: none;
+    color: #64748b;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+.btn-clear-search:hover {
+    background: #ef4444;
+    color: white;
+}
 </style>
 
 <script>
+function clearLiveSearch(gridId) {
+    const input = document.getElementById(gridId === 'home' ? 'homeLiveSearch' : 'listLiveSearch');
+    const clearBtn = document.getElementById(gridId === 'home' ? 'clearHomeSearch' : 'clearListSearch');
+    if (input) {
+        input.value = '';
+        input.focus();
+    }
+    if (clearBtn) clearBtn.style.display = 'none';
+    applyFilter(gridId);
+}
+
 function applyFilter(gridId) {
     const catGroup   = document.getElementById('catFilter'  + (gridId === 'home' ? 'Home' : 'List'));
     const typeGroup  = document.getElementById('typeFilter' + (gridId === 'home' ? 'Home' : 'List'));
     const grid       = document.getElementById(gridId === 'home' ? 'homeAnnonceGrid' : 'annoncesGrid');
     const countEl    = document.getElementById(gridId === 'home' ? 'homeResultCount' : 'listResultCount');
     const maxPriceEl = document.getElementById('filterPriceMax');
+    const searchInput = document.getElementById(gridId === 'home' ? 'homeLiveSearch' : 'listLiveSearch');
+    const clearBtn   = document.getElementById(gridId === 'home' ? 'clearHomeSearch' : 'clearListSearch');
 
     // Gérer l'activation du bouton cliqué (toggle dans le groupe)
     if (window.event && window.event.currentTarget) {
@@ -635,6 +818,13 @@ function applyFilter(gridId) {
     const selType  = typeGroup ? (typeGroup.querySelector('.smart-btn.active')?.dataset.type || 'all') : 'all';
     const maxPrice = (maxPriceEl && maxPriceEl.value !== '') ? parseFloat(maxPriceEl.value) : null;
 
+    // Mots-clés tapés librement
+    const rawQuery = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    if (clearBtn) {
+        clearBtn.style.display = rawQuery.length > 0 ? 'inline-flex' : 'none';
+    }
+    const queryWords = rawQuery.length > 0 ? rawQuery.split(/\s+/).filter(w => w.length > 0) : [];
+
     const cardSel = gridId === 'home' ? '#homeAnnonceGrid .annonce-card-pro' : '#annoncesGrid .annonce-card';
     const cards = document.querySelectorAll(cardSel);
 
@@ -645,7 +835,13 @@ function applyFilter(gridId) {
         const cardPrice  = card.dataset.price ? parseFloat(card.dataset.price) : 0;
         const matchPrice = (maxPrice === null || isNaN(maxPrice)) ? true : (cardPrice <= maxPrice);
 
-        if (matchCat && matchType && matchPrice) {
+        let matchQuery = true;
+        if (queryWords.length > 0) {
+            const cardText = (card.textContent || card.innerText || '').toLowerCase();
+            matchQuery = queryWords.every(word => cardText.includes(word));
+        }
+
+        if (matchCat && matchType && matchPrice && matchQuery) {
             card.classList.remove('hidden');
             visible++;
         } else {
@@ -655,7 +851,7 @@ function applyFilter(gridId) {
 
     if (countEl) {
         countEl.textContent = visible === 0
-            ? 'Aucun bien ne correspond à cette sélection.'
+            ? 'Aucun bien ne correspond à votre recherche.'
             : `${visible} bien${visible > 1 ? 's' : ''} disponible${visible > 1 ? 's' : ''}`;
     }
 
@@ -666,7 +862,7 @@ function applyFilter(gridId) {
         msg = document.createElement('div');
         msg.id = emptyId;
         msg.style.cssText = 'grid-column:1/-1;text-align:center;padding:60px 0;color:#64748b;';
-        msg.innerHTML = '<i class="fas fa-search" style="font-size:2.5rem;display:block;margin-bottom:15px;color:#e2e8f0;"></i>Aucun bien dans cette catégorie pour le moment.';
+        msg.innerHTML = '<i class="fas fa-search" style="font-size:2.5rem;display:block;margin-bottom:15px;color:#cbd5e1;"></i>Aucun bien ne correspond à votre recherche avec ces critères.';
         grid.appendChild(msg);
     }
     if (msg) {

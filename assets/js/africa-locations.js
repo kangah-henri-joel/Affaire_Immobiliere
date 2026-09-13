@@ -225,44 +225,58 @@
         },
         "Côte d'Ivoire": {
             "Abidjan": {
-                "Cocody": ["Angré", "Riviera 1", "Riviera 2", "Riviera 3", "Riviera 4", "Riviera 5", "Riviera 6", "2 Plateaux", "Palmeraie", "Bonoumin", "Danga", "Ambassades", "Vallon", "M'Pouto", "M'Badon", "Saint Jean", "Attoban", "Génie 2000", "Djibi"],
-                "Yopougon": ["Niangon", "Maroc", "Bel Air", "Kouté", "Toits Rouges", "Selmer", "Académie", "Wassakara", "Sideci", "Nouveau Quartier", "Andokoi", "Millionnaire", "Port-Bouët 2", "Santai"],
-                "Marcory": ["Zone 4", "Biétry", "Anoumabo", "Résidentiel", "Champroux", "Remblais", "Hibiscus"],
-                "Abobo": ["Sagbé", "PK18", "N'Dotré", "Avocatier", "Anador", "Houantoué", "Depot", "Belle Ville", "Akeikoi"],
-                "Port-Bouët": ["Gonzaqueville", "Vridi", "Derrière L'Appartement", "Phare", "Centre", "Abjou-Cité"],
-                "Plateau": ["Centre des Affaires", "Cité Administrative", "Banques", "Pygmalion"],
-                "Adjamé": ["Château", "Mirador", "220 Logements", "Siporex", "Renault"],
-                "Treichville": ["Arras", "Avenue 16", "Zone Industrielle", "Belleville"],
-                "Koumassi": ["Remblais", "Camp Commando", "Grand Campement", "Zattry"],
-                "Attécoubé": ["Locodjro", "Abobo-Doumé", "Santé"],
-                "Bingerville": ["Cité FEU", "Akandjé", "Savane", "Blokhauss", "ECA"]
-            },
-            "Yamoussoukro": {
-                "Centre-Ville": ["Morofé", "Habitat", "220 Logements", "Fondation", "N'Gokro", "Koko", "Zaher", "Residentiel"]
-            },
-            "Bouaké": {
-                "Centre-Ville": ["Air France 1", "Air France 2", "Koko", "Nimbo", "Belleville", "Dar-es-Salam", "Kennedy", "Broukro", "Ahougnanssou"]
-            },
-            "San-Pédro": {
-                "San-Pédro Centre": ["Cité", "Bardot", "Balmer", "Seweke", "Zone Industrielle"]
-            },
-            "Korhogo": {
-                "Korhogo Centre": ["Koko", "Soba", "Haoussabougou", "Prefecture", "Sinistré"]
-            },
-            "Daloa": {
-                "Daloa Centre": ["Tazibouo", "Lobia", "Gbeuliville", "Kennedy"]
-            },
-            "Man": {
-                "Man Centre": ["Lycée", "Grand Gbapleu", "Doyagouiné", "Koko"]
-            },
-            "Gagnoa": {
-                "Gagnoa Centre": ["Babré", "Garahio", "Zapredine", "Dioulabougou"]
-            },
-            "Abengourou": {
-                "Abengourou Centre": ["Agni-Mansou", "Relais", "Plateau", "Indénié"]
+                "Cocody": ["Angré", "Angré 7ème Tranche", "Angré 8ème Tranche", "Angré 9ème Tranche", "Angré Château", "Angré Djibi", "Riviera 1", "Riviera 2", "Riviera 3", "Riviera 4", "Riviera 5", "Riviera Golf", "Riviera Bonoumin", "Riviera Palmeraie", "Riviera Faya", "Deux Plateaux", "Deux Plateaux Vallon", "Deux Plateaux Aghien", "Deux Plateaux 7ème Tranche", "Danga", "Ambassades", "M'Pouto", "M'Badon", "Anono", "Saint Jean", "Attoban", "Génie 2000", "Abatta"],
+                "Bingerville": ["Feh Kessé", "Akandjé", "Cité FEU", "Savane", "Blokhauss", "ECA", "Marché", "Adjamé-Bingerville", "Sebroko", "Gbagba"],
+                "Marcory": ["Zone 4", "Biétry", "Anoumabo", "Marcory Résidentiel", "Champroux", "Remblais", "Hibiscus", "Aliodan", "INJS", "Konankro"],
+                "Yopougon": ["Niangon Nord", "Niangon Sud", "Maroc", "Bel Air", "Kouté", "Toits Rouges", "Selmer", "Académie", "Wassakara", "Sideci", "Nouveau Quartier", "Andokoi", "Millionnaire", "Port-Bouët 2", "Santai", "Gesco", "Siporex", "Zone Industrielle", "Camp Militaire", "Lièvre Rouge"],
+                "Plateau": ["Centre des Affaires", "Cité Administrative", "Boulevard Lagunaire", "Banques", "Pygmalion", "Sodeci"],
+                "Port-Bouët": ["Gonzaqueville", "Vridi", "Vridi Canal", "Derrière Wharf", "Phare", "Centre", "Abjou-Cité", "Adjouffou", "Anani", "Jean Folly", "Aéroport"],
+                "Koumassi": ["Remblais", "Camp Commando", "Grand Campement", "Zattry", "Sopim", "Divo", "Acaly", "05"],
+                "Treichville": ["Arras", "Avenue 16", "Zone Industrielle", "Belleville", "France Amérique", "Habitat", "Gare de Bassam"],
+                "Adjamé": ["Château d'Eau", "Mirador", "220 Logements", "Siporex", "Renault", "Williamsville", "Habitat Extension", "Paillet"],
+                "Abobo": ["Sagbé", "PK18", "N'Dotré", "Avocatier", "Anador", "Houantoué", "Depot", "Belle Ville", "Akeikoi", "Bocabo", "Samaké", "Abobo Baoulé", "Anonkoua Kouté"],
+                "Attécoubé": ["Locodjro", "Abobo-Doumé", "Santé", "Agban", "Jean-Paul 2", "Bidjante"],
+                "Songon": ["Songon Agban", "Songon Kassemblé", "Songon Dagbé", "Songon M'Brathé", "Abiaté"],
+                "Anyama": ["Anyama Centre", "Ebimpé", "Akeikoi", "Cité Belle Ville", "Schneider"]
             },
             "Grand-Bassam": {
-                "Grand-Bassam Centre": ["Quartier France", "Moossou", "Imperial", "Phare"]
+                "Grand-Bassam": ["Quartier France", "Moossou", "Impérial", "Phare", "Rosiers", "Mockeyville", "Modeste", "Azuretti", "CAFOP", "Zone Hôtelière"]
+            },
+            "Assinie": {
+                "Assinie": ["Assinie Mafia", "Assinie France", "PK 0 à 10", "PK 10 à 20", "Mandjan", "Essankro"]
+            },
+            "Bonoua": {
+                "Bonoua": ["Centre-Ville", "Begnini", "Bronoukro", "Kumassi"]
+            },
+            "Dabou": {
+                "Dabou": ["Centre-Ville", "Kpass", "Gbougbo", "Debrimou"]
+            },
+            "Jacqueville": {
+                "Jacqueville": ["Bord de Mer", "Centre-Ville", "N'djem", "Sassako", "Abreby"]
+            },
+            "Yamoussoukro": {
+                "Yamoussoukro": ["Morofé", "Habitat", "220 Logements", "Fondation", "N'Gokro", "Koko", "Zaher", "Résidentiel", "Assabou", "Dioulakro", "Kokrenou"]
+            },
+            "Bouaké": {
+                "Bouaké": ["Air France 1", "Air France 2", "Koko", "Nimbo", "Belleville", "Dar-es-Salam", "Kennedy", "Broukro", "Ahougnanssou", "Commerce", "Zone Industrielle", "N'Gattakro"]
+            },
+            "San-Pédro": {
+                "San-Pédro": ["Balmer", "Cité", "Bardot", "Seweke", "Zone Portuaire", "Lac", "Nitoro", "Poro"]
+            },
+            "Korhogo": {
+                "Korhogo": ["Koko", "Soba", "Haoussabougou", "Préfecture", "Sinistré", "Télescope", "Résidentiel"]
+            },
+            "Daloa": {
+                "Daloa": ["Tazibouo", "Lobia", "Gbeuliville", "Kennedy", "Commerce", "Marais"]
+            },
+            "Man": {
+                "Man": ["Lycée", "Grand Gbapleu", "Doyagouiné", "Koko", "Domoraud", "Sari"]
+            },
+            "Gagnoa": {
+                "Gagnoa": ["Babré", "Garahio", "Zapredine", "Dioulabougou", "Rond-Point"]
+            },
+            "Abengourou": {
+                "Abengourou": ["Agni-Mansou", "Relais", "Plateau", "Indénié", "Château"]
             }
         },
         "Djibouti": {
@@ -727,17 +741,27 @@
     // ── 2. FONCTIONS DE RECHERCHE DE DONNÉES ───────────────────────────────────
 
     function getCountries() {
-        return Object.keys(AFRICA_LOCATIONS).sort((a, b) => a.localeCompare(b, 'fr'));
+        const countries = Object.keys(AFRICA_LOCATIONS).sort((a, b) => a.localeCompare(b, 'fr'));
+        const ciIdx = countries.indexOf("Côte d'Ivoire");
+        if (ciIdx > -1) {
+            countries.splice(ciIdx, 1);
+            countries.unshift("Côte d'Ivoire");
+        }
+        return countries;
     }
 
     function getCities(country) {
         if (!country || !AFRICA_LOCATIONS[country]) {
-            // Retourner toutes les principales villes si pas de pays choisi
+            // Proposer en priorité les grandes villes de Côte d'Ivoire puis les autres capitales
+            let ciCities = AFRICA_LOCATIONS["Côte d'Ivoire"] ? Object.keys(AFRICA_LOCATIONS["Côte d'Ivoire"]) : [];
             let allCities = [];
             Object.keys(AFRICA_LOCATIONS).forEach(c => {
-                allCities = allCities.concat(Object.keys(AFRICA_LOCATIONS[c]));
+                if (c !== "Côte d'Ivoire") {
+                    allCities = allCities.concat(Object.keys(AFRICA_LOCATIONS[c]));
+                }
             });
-            return Array.from(new Set(allCities)).sort((a, b) => a.localeCompare(b, 'fr'));
+            let sortedOther = Array.from(new Set(allCities)).sort((a, b) => a.localeCompare(b, 'fr'));
+            return [...ciCities, ...sortedOther];
         }
         return Object.keys(AFRICA_LOCATIONS[country]).sort((a, b) => a.localeCompare(b, 'fr'));
     }
@@ -747,14 +771,13 @@
             if (city && AFRICA_LOCATIONS[country][city]) {
                 return Object.keys(AFRICA_LOCATIONS[country][city]).sort((a, b) => a.localeCompare(b, 'fr'));
             }
-            // Si pas de ville spécifiée dans ce pays, agréger les communes
+            // Si pas de ville spécifiée dans ce pays, agréger toutes les communes de ce pays
             let cityCommunes = [];
             Object.keys(AFRICA_LOCATIONS[country]).forEach(v => {
                 cityCommunes = cityCommunes.concat(Object.keys(AFRICA_LOCATIONS[country][v]));
             });
             return Array.from(new Set(cityCommunes)).sort((a, b) => a.localeCompare(b, 'fr'));
         }
-        // Fallback global
         if (city) {
             let foundCommunes = [];
             Object.keys(AFRICA_LOCATIONS).forEach(c => {
@@ -766,7 +789,14 @@
                 return Array.from(new Set(foundCommunes)).sort((a, b) => a.localeCompare(b, 'fr'));
             }
         }
-        return [];
+        // Par défaut (aucun pays ni ville sélectionné), proposer les communes de Côte d'Ivoire
+        let defaultCommunes = [];
+        if (AFRICA_LOCATIONS["Côte d'Ivoire"]) {
+            Object.keys(AFRICA_LOCATIONS["Côte d'Ivoire"]).forEach(v => {
+                defaultCommunes = defaultCommunes.concat(Object.keys(AFRICA_LOCATIONS["Côte d'Ivoire"][v]));
+            });
+        }
+        return Array.from(new Set(defaultCommunes)).sort((a, b) => a.localeCompare(b, 'fr'));
     }
 
     function getQuartiers(country, city, commune) {
@@ -776,135 +806,218 @@
             return AFRICA_LOCATIONS[country][city][commune];
         }
         // Cas 2 : Recherche par Commune seule ou Ville+Commune
-        Object.keys(AFRICA_LOCATIONS).forEach(c => {
-            if (country && c !== country) return;
-            Object.keys(AFRICA_LOCATIONS[c]).forEach(v => {
-                if (city && v !== city) return;
-                Object.keys(AFRICA_LOCATIONS[c][v]).forEach(com => {
-                    if (!commune || com.toLowerCase().includes(commune.toLowerCase())) {
-                        quartiers = quartiers.concat(AFRICA_LOCATIONS[c][v][com]);
-                    }
+        if (commune || city || country) {
+            Object.keys(AFRICA_LOCATIONS).forEach(c => {
+                if (country && c !== country) return;
+                Object.keys(AFRICA_LOCATIONS[c]).forEach(v => {
+                    if (city && v !== city) return;
+                    Object.keys(AFRICA_LOCATIONS[c][v]).forEach(com => {
+                        if (!commune || com.toLowerCase().includes(commune.toLowerCase())) {
+                            quartiers = quartiers.concat(AFRICA_LOCATIONS[c][v][com]);
+                        }
+                    });
                 });
             });
-        });
+            return Array.from(new Set(quartiers)).sort((a, b) => a.localeCompare(b, 'fr'));
+        }
+        // Par défaut (rien de sélectionné), proposer les quartiers phares de Côte d'Ivoire
+        if (AFRICA_LOCATIONS["Côte d'Ivoire"]?.["Abidjan"]) {
+            Object.keys(AFRICA_LOCATIONS["Côte d'Ivoire"]["Abidjan"]).forEach(com => {
+                quartiers = quartiers.concat(AFRICA_LOCATIONS["Côte d'Ivoire"]["Abidjan"][com]);
+            });
+        }
         return Array.from(new Set(quartiers)).sort((a, b) => a.localeCompare(b, 'fr'));
     }
 
-    // ── 3. MISE À JOUR POPULATION DES DATALISTS ────────────────────────────────
+    // ── 3. MISE À JOUR POPULATION DES SELECTS ET DATALISTS ───────────────────────
 
-    function updateDatalist(datalistId, items) {
-        const datalist = document.getElementById(datalistId);
-        if (!datalist) return;
-        datalist.innerHTML = '';
-        const fragment = document.createDocumentFragment();
-        items.forEach(item => {
-            const opt = document.createElement('option');
-            opt.value = item;
-            fragment.appendChild(opt);
-        });
-        datalist.appendChild(fragment);
+    function populateTarget(elementOrId, items, placeholder) {
+        if (!elementOrId) return;
+        const el = typeof elementOrId === 'string' ? document.getElementById(elementOrId) : elementOrId;
+        if (!el) return;
+
+        if (el.tagName === 'SELECT') {
+            const desiredVal = el.getAttribute('data-value') || el.value || '';
+            el.innerHTML = '';
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = placeholder || 'Tous';
+            el.appendChild(defaultOpt);
+
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                if (item === desiredVal) {
+                    opt.selected = true;
+                }
+                el.appendChild(opt);
+            });
+
+            if (desiredVal && items.includes(desiredVal)) {
+                el.value = desiredVal;
+            }
+        } else if (el.tagName === 'DATALIST') {
+            el.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                fragment.appendChild(opt);
+            });
+            el.appendChild(fragment);
+        }
     }
 
     // ── 4. ATTACHEMENT DU CASCADING SUR UN GROUPE DE CHAMPS ────────────────────
 
     function bindCascadingGroup(config) {
-        const inputPays     = document.querySelector(config.paysSelector);
-        const datalistPays  = config.paysDatalistId;
-        const inputVille    = document.querySelector(config.villeSelector);
-        const datalistVille = config.villeDatalistId;
-        const inputCommune  = document.querySelector(config.communeSelector);
-        const datalistCommune = config.communeDatalistId;
-        const inputQuartier = document.querySelector(config.quartierSelector);
-        const datalistQuartier = config.quartierDatalistId;
+        const elPays     = document.querySelector(config.paysSelector);
+        const elVille    = document.querySelector(config.villeSelector);
+        const elCommune  = document.querySelector(config.communeSelector);
+        const elQuartier = document.querySelector(config.quartierSelector);
 
-        // Populate initiales
-        updateDatalist(datalistPays, getCountries());
+        if (!elPays && !elVille && !elCommune && !elQuartier) return;
 
-        function refreshAll() {
-            const currentPays = inputPays ? inputPays.value.trim() : '';
-            const currentVille = inputVille ? inputVille.value.trim() : '';
-            const currentCommune = inputCommune ? inputCommune.value.trim() : '';
+        const targetPays     = (elPays && elPays.tagName === 'SELECT') ? elPays : document.getElementById(config.paysDatalistId);
+        const targetVille    = (elVille && elVille.tagName === 'SELECT') ? elVille : document.getElementById(config.villeDatalistId);
+        const targetCommune  = (elCommune && elCommune.tagName === 'SELECT') ? elCommune : document.getElementById(config.communeDatalistId);
+        const targetQuartier = (elQuartier && elQuartier.tagName === 'SELECT') ? elQuartier : document.getElementById(config.quartierDatalistId);
 
-            updateDatalist(datalistVille, getCities(currentPays));
-            updateDatalist(datalistCommune, getCommunes(currentPays, currentVille));
-            updateDatalist(datalistQuartier, getQuartiers(currentPays, currentVille, currentCommune));
+        // Populate initiales des pays
+        populateTarget(targetPays, getCountries(), config.paysPlaceholder || 'Tous les pays');
+
+        function refreshCascade() {
+            const currentPays    = elPays ? elPays.value.trim() : '';
+            const currentVille   = elVille ? elVille.value.trim() : '';
+            const currentCommune = elCommune ? elCommune.value.trim() : '';
+
+            populateTarget(targetVille, getCities(currentPays), config.villePlaceholder || 'Toutes les villes');
+            populateTarget(targetCommune, getCommunes(currentPays, currentVille), config.communePlaceholder || 'Toutes les communes');
+            populateTarget(targetQuartier, getQuartiers(currentPays, currentVille, currentCommune), config.quartierPlaceholder || 'Tous les quartiers');
         }
 
-        refreshAll();
+        refreshCascade();
 
-        if (inputPays) {
-            inputPays.addEventListener('input', () => {
-                refreshAll();
+        if (elPays) {
+            elPays.addEventListener('change', () => {
+                if (elVille && elVille.tagName === 'SELECT') { elVille.removeAttribute('data-value'); elVille.value = ''; }
+                if (elCommune && elCommune.tagName === 'SELECT') { elCommune.removeAttribute('data-value'); elCommune.value = ''; }
+                if (elQuartier && elQuartier.tagName === 'SELECT') { elQuartier.removeAttribute('data-value'); elQuartier.value = ''; }
+                refreshCascade();
             });
-            inputPays.addEventListener('change', refreshAll);
+            if (elPays.tagName !== 'SELECT') elPays.addEventListener('input', refreshCascade);
         }
 
-        if (inputVille) {
-            inputVille.addEventListener('input', () => {
-                const currentPays = inputPays ? inputPays.value.trim() : '';
-                const currentVille = inputVille.value.trim();
-                updateDatalist(datalistCommune, getCommunes(currentPays, currentVille));
-                updateDatalist(datalistQuartier, getQuartiers(currentPays, currentVille, inputCommune ? inputCommune.value.trim() : ''));
+        if (elVille) {
+            elVille.addEventListener('change', () => {
+                const currentPays  = elPays ? elPays.value.trim() : '';
+                const currentVille = elVille.value.trim();
+                if (elCommune && elCommune.tagName === 'SELECT') { elCommune.removeAttribute('data-value'); elCommune.value = ''; }
+                if (elQuartier && elQuartier.tagName === 'SELECT') { elQuartier.removeAttribute('data-value'); elQuartier.value = ''; }
+                populateTarget(targetCommune, getCommunes(currentPays, currentVille), config.communePlaceholder || 'Toutes les communes');
+                populateTarget(targetQuartier, getQuartiers(currentPays, currentVille, elCommune ? elCommune.value.trim() : ''), config.quartierPlaceholder || 'Tous les quartiers');
             });
-            inputVille.addEventListener('change', refreshAll);
+            if (elVille.tagName !== 'SELECT') elVille.addEventListener('input', refreshCascade);
         }
 
-        if (inputCommune) {
-            inputCommune.addEventListener('input', () => {
-                const currentPays = inputPays ? inputPays.value.trim() : '';
-                const currentVille = inputVille ? inputVille.value.trim() : '';
-                const currentCommune = inputCommune.value.trim();
-                updateDatalist(datalistQuartier, getQuartiers(currentPays, currentVille, currentCommune));
+        if (elCommune) {
+            elCommune.addEventListener('change', () => {
+                const currentPays    = elPays ? elPays.value.trim() : '';
+                const currentVille   = elVille ? elVille.value.trim() : '';
+                const currentCommune = elCommune.value.trim();
+                if (elQuartier && elQuartier.tagName === 'SELECT') { elQuartier.removeAttribute('data-value'); elQuartier.value = ''; }
+                populateTarget(targetQuartier, getQuartiers(currentPays, currentVille, currentCommune), config.quartierPlaceholder || 'Tous les quartiers');
             });
+            if (elCommune.tagName !== 'SELECT') elCommune.addEventListener('input', refreshCascade);
         }
     }
 
     // ── 5. INITIALISATION AUTOMATIQUE SUR LE DOM ───────────────────────────────
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // A. Filtres de la page Liste d'Annonces (/annonces)
+    function initAfricaLocations() {
+        // A. Formulaire Hero de la page d'accueil (Home)
         bindCascadingGroup({
-            paysSelector: '#filterPays, input[name="pays"]',
-            paysDatalistId: 'list-pays',
-            villeSelector: '#filterVille, input[name="ville"]',
-            villeDatalistId: 'list-villes',
-            communeSelector: '#filterCommune, input[name="commune"]',
-            communeDatalistId: 'list-communes',
-            quartierSelector: '#filterQuartier, input[name="quartier"]',
-            quartierDatalistId: 'list-quartiers'
-        });
-
-        // B. Formulaire d'administration (/admin/annonces)
-        bindCascadingGroup({
-            paysSelector: '#addAnnonceModal input[name="pays"]',
-            paysDatalistId: 'admin-list-pays',
-            villeSelector: '#addAnnonceModal input[name="ville"]',
-            villeDatalistId: 'admin-list-villes',
-            communeSelector: '#addAnnonceModal input[name="commune"]',
-            communeDatalistId: 'admin-list-communes',
-            quartierSelector: '#addAnnonceModal input[name="quartier"]',
-            quartierDatalistId: 'admin-list-quartiers'
-        });
-
-        // C. Formulaire Hero de la page d'accueil (Home)
-        bindCascadingGroup({
-            paysSelector: '#heroPays, .search-form-pro input[name="pays"]',
+            paysSelector: '#heroPays',
             paysDatalistId: 'hero-pays',
-            villeSelector: '#heroVille, .search-form-pro input[name="ville"]',
+            paysPlaceholder: 'Tous les pays',
+            villeSelector: '#heroVille',
             villeDatalistId: 'hero-villes',
-            communeSelector: '#heroCommune, .search-form-pro input[name="commune"]',
+            villePlaceholder: 'Toutes les villes',
+            communeSelector: '#heroCommune',
             communeDatalistId: 'hero-communes',
-            quartierSelector: '#heroQuartier, .search-form-pro input[name="quartier"], .search-form-pro input[name="query"]',
-            quartierDatalistId: 'hero-quartiers'
+            communePlaceholder: 'Toutes les communes',
+            quartierSelector: '#heroQuartier',
+            quartierDatalistId: 'hero-quartiers',
+            quartierPlaceholder: 'Tous les quartiers'
         });
 
-        // D. Formulaire d'inscription (Login/Register)
-        const registerCountry = document.querySelector('#tab-register input[name="country"]');
+        // B. Filtres de la page Liste d'Annonces (/annonces)
+        bindCascadingGroup({
+            paysSelector: '#filterPays',
+            paysDatalistId: 'list-pays',
+            paysPlaceholder: 'Tous les pays',
+            villeSelector: '#filterVille',
+            villeDatalistId: 'list-villes',
+            villePlaceholder: 'Toutes les villes',
+            communeSelector: '#filterCommune',
+            communeDatalistId: 'list-communes',
+            communePlaceholder: 'Toutes les communes',
+            quartierSelector: '#filterQuartier',
+            quartierDatalistId: 'list-quartiers',
+            quartierPlaceholder: 'Tous les quartiers'
+        });
+
+        // C. Formulaire d'administration (/admin/annonces)
+        bindCascadingGroup({
+            paysSelector: '#adminPays, #addAnnonceModal select[name="pays"], #addAnnonceModal input[name="pays"]',
+            paysDatalistId: 'admin-list-pays',
+            paysPlaceholder: 'Choisir un pays',
+            villeSelector: '#adminVille, #addAnnonceModal select[name="ville"], #addAnnonceModal input[name="ville"]',
+            villeDatalistId: 'admin-list-villes',
+            villePlaceholder: 'Choisir une ville',
+            communeSelector: '#adminCommune, #addAnnonceModal select[name="commune"], #addAnnonceModal input[name="commune"]',
+            communeDatalistId: 'admin-list-communes',
+            communePlaceholder: 'Choisir une commune',
+            quartierSelector: '#adminQuartier, #addAnnonceModal select[name="quartier"], #addAnnonceModal input[name="quartier"]',
+            quartierDatalistId: 'admin-list-quartiers',
+            quartierPlaceholder: 'Choisir un quartier'
+        });
+
+        // D. Formulaire de demande (/demandes)
+        bindCascadingGroup({
+            paysSelector: '#demandePays',
+            paysDatalistId: 'list-pays',
+            paysPlaceholder: 'Tous les pays',
+            villeSelector: '#demandeVille',
+            villeDatalistId: 'list-villes',
+            villePlaceholder: 'Toutes les villes',
+            communeSelector: '#demandeCommune',
+            communeDatalistId: 'list-communes',
+            communePlaceholder: 'Toutes les communes',
+            quartierSelector: '#demandeQuartier',
+            quartierDatalistId: 'list-quartiers',
+            quartierPlaceholder: 'Tous les quartiers'
+        });
+
+        // E. Formulaire d'inscription (Login/Register)
+        const registerCountry = document.querySelector('#tab-register select[name="country"], #tab-register input[name="country"]');
         if (registerCountry) {
-            registerCountry.setAttribute('list', 'list-pays');
+            if (registerCountry.tagName === 'SELECT') {
+                populateTarget(registerCountry, getCountries(), 'Choisir votre pays');
+            } else {
+                registerCountry.setAttribute('list', 'list-pays');
+            }
         }
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAfricaLocations);
+    } else {
+        initAfricaLocations();
+    }
 
     // Exposer l'objet globalement pour utilisation personnalisée si besoin
     window.AFRICA_LOCATIONS = AFRICA_LOCATIONS;
+    window.bindCascadingGroup = bindCascadingGroup;
 })();

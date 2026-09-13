@@ -1,4 +1,7 @@
-<?php include __DIR__ . '/../layout_header.php'; ?>
+<?php 
+include __DIR__ . '/../layout_header.php'; 
+$geoPresets = AnnonceModel::getPresetLocations();
+?>
 
 <section class="demandes-section">
     <div class="container">
@@ -113,26 +116,42 @@
                         <div class="form-row-2">
                             <div class="form-group">
                                 <label><i class="fas fa-globe-africa"></i> Pays désiré</label>
-                                <input type="text" name="pays" id="demandePays" list="list-pays" placeholder="Ex: Côte d'Ivoire" class="form-control-pro">
-                                <datalist id="list-pays"></datalist>
+                                <select name="pays" id="demandePays" class="form-control-pro">
+                                    <option value="">Choisir un pays</option>
+                                    <?php foreach ($geoPresets['pays'] as $p): ?>
+                                        <option value="<?php echo htmlspecialchars($p); ?>"><?php echo htmlspecialchars($p); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label><i class="fas fa-city"></i> Ville désiré</label>
-                                <input type="text" name="ville" id="demandeVille" list="list-villes" placeholder="Ex: Abidjan" class="form-control-pro">
-                                <datalist id="list-villes"></datalist>
+                                <select name="ville" id="demandeVille" class="form-control-pro">
+                                    <option value="">Choisir une ville</option>
+                                    <?php foreach ($geoPresets['villes'] as $v): ?>
+                                        <option value="<?php echo htmlspecialchars($v); ?>"><?php echo htmlspecialchars($v); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                         </div>
 
                         <div class="form-row-2">
                             <div class="form-group">
                                 <label><i class="fas fa-map"></i> Commune désiré</label>
-                                <input type="text" name="commune" id="demandeCommune" list="list-communes" placeholder="Ex: Cocody, Yopougon..." class="form-control-pro">
-                                <datalist id="list-communes"></datalist>
+                                <select name="commune" id="demandeCommune" class="form-control-pro">
+                                    <option value="">Choisir une commune</option>
+                                    <?php foreach ($geoPresets['communes'] as $com): ?>
+                                        <option value="<?php echo htmlspecialchars($com); ?>"><?php echo htmlspecialchars($com); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label><i class="fas fa-map-pin"></i> Quartier souhaité</label>
-                                <input type="text" name="quartier" id="demandeQuartier" list="list-quartiers" placeholder="Ex: Angré 8ème tranche..." class="form-control-pro">
-                                <datalist id="list-quartiers"></datalist>
+                                <select name="quartier" id="demandeQuartier" class="form-control-pro">
+                                    <option value="">Choisir un quartier</option>
+                                    <?php foreach ($geoPresets['quartiers'] as $q): ?>
+                                        <option value="<?php echo htmlspecialchars($q); ?>"><?php echo htmlspecialchars($q); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                         </div>
 
@@ -384,6 +403,18 @@
     color: #0f172a;
     background: #ffffff;
     font-family: inherit;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+select.form-control-pro {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px 16px;
+    padding-right: 40px;
+    appearance: none;
+    -webkit-appearance: none;
 }
 .form-control-pro:focus {
     outline: none;

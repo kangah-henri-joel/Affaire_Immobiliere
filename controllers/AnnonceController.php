@@ -39,7 +39,14 @@ class AnnonceController extends Controller {
             'quartier'  => $_GET['quartier'] ?? '',
         ];
         $annonces = $this->model->getAll($filters);
-        $this->render('annonces/index', ['annonces' => $annonces, 'title' => 'Toutes les Annonces']);
+        $categories = $this->model->getCategories();
+        $dbLocations = $this->model->getDistinctLocations();
+        $this->render('annonces/index', [
+            'annonces'    => $annonces,
+            'title'       => 'Toutes les Annonces',
+            'categories'  => $categories,
+            'dbLocations' => $dbLocations,
+        ]);
     }
 
     public function map() {

@@ -6,9 +6,40 @@ require_once __DIR__ . '/Controller.php';
 class HomeController extends Controller {
 
     public function index() {
-        $model   = new AnnonceModel();
+        $model = new AnnonceModel();
         $annonces = $model->getAll(['limit' => 12]);
-        $this->render('home', ['title' => 'ImmoAffaire – L\'immobilier d\'exception en Côte d\'Ivoire', 'annonces' => $annonces]);
+        $totalAnnonces = $model->countActive();
+        $rawCatCounts = $model->getCategoryCounts();
+
+        // Indexer les compteurs par slug pour un accès simple dans la vue
+        $categoryCounts = [];
+        foreach ($rawCatCounts as $row) {
+            $categoryCounts[$row['slug']] = (int)$row['count'];
+        }
+
+        $demandeCount = 0;
+        if (file_exists(__DIR__ . '/../models/DemandeModel.php')) {
+            require_once __DIR__ . '/../models/DemandeModel.php';
+            try {
+                $demandeModel = new DemandeModel();
+                $demandeCount = $demandeModel->countActive();
+            } catch (\Exception $e) {
+                $demandeCount = 0;
+            }
+        }
+
+        $categories = $model->getCategories();
+        $dbLocations = $model->getDistinctLocations();
+
+        $this->render('home', [
+            'title'          => 'ImmoAffaire – L\'immobilier d\'exception en Côte d\'Ivoire',
+            'annonces'       => $annonces,
+            'totalAnnonces'  => $totalAnnonces,
+            'categoryCounts' => $categoryCounts,
+            'demandeCount'   => $demandeCount,
+            'categories'     => $categories,
+            'dbLocations'    => $dbLocations,
+        ]);
     }
 
     public function contact() {

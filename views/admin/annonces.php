@@ -1,4 +1,7 @@
-<?php include __DIR__ . '/../layout_header.php'; ?>
+<?php 
+include __DIR__ . '/../layout_header.php'; 
+$geoPresets = AnnonceModel::getPresetLocations();
+?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/lib/leaflet/leaflet.css" />
 
 <div class="admin-container">
@@ -183,23 +186,39 @@
                 <div class="geo-admin-fields">
                     <div class="form-group">
                         <label><i class="fas fa-globe-africa"></i> Pays</label>
-                        <input type="text" name="pays" list="admin-list-pays" placeholder="Ex: Côte d'Ivoire">
-                        <datalist id="admin-list-pays"></datalist>
+                        <select name="pays" id="adminPays">
+                            <option value="">Choisir un pays</option>
+                            <?php foreach ($geoPresets['pays'] as $p): ?>
+                                <option value="<?php echo htmlspecialchars($p); ?>"><?php echo htmlspecialchars($p); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-city"></i> Ville</label>
-                        <input type="text" name="ville" list="admin-list-villes" placeholder="Ex: Abidjan">
-                        <datalist id="admin-list-villes"></datalist>
+                        <select name="ville" id="adminVille">
+                            <option value="">Choisir une ville</option>
+                            <?php foreach ($geoPresets['villes'] as $v): ?>
+                                <option value="<?php echo htmlspecialchars($v); ?>"><?php echo htmlspecialchars($v); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-map"></i> Commune</label>
-                        <input type="text" name="commune" list="admin-list-communes" placeholder="Ex: Cocody">
-                        <datalist id="admin-list-communes"></datalist>
+                        <select name="commune" id="adminCommune">
+                            <option value="">Choisir une commune</option>
+                            <?php foreach ($geoPresets['communes'] as $com): ?>
+                                <option value="<?php echo htmlspecialchars($com); ?>"><?php echo htmlspecialchars($com); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-map-pin"></i> Quartier</label>
-                        <input type="text" name="quartier" list="admin-list-quartiers" placeholder="Ex: Angré, Riviera...">
-                        <datalist id="admin-list-quartiers"></datalist>
+                        <select name="quartier" id="adminQuartier">
+                            <option value="">Choisir un quartier</option>
+                            <?php foreach ($geoPresets['quartiers'] as $q): ?>
+                                <option value="<?php echo htmlspecialchars($q); ?>"><?php echo htmlspecialchars($q); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -258,7 +277,23 @@
 .btn-ai { background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 10px; cursor: pointer; font-weight: 600; }
 .btn-submit { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 20px; }
 .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); }
-.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-family: inherit; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s; }
+.form-group select {
+    cursor: pointer;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    padding-right: 36px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
 /* Géolocalisation */
 .geo-search-bar { display: flex; gap: 8px; margin-bottom: 8px; }
 .geo-search-input-wrap { flex: 1; display: flex; align-items: center; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 12px; gap: 8px; background: white; }
@@ -443,7 +478,7 @@
         status.className = 'geo-status loading';
         status.textContent = '🔍 Recherche en cours...';
 
-        const paysInput = document.querySelector('#addAnnonceModal input[name="pays"]');
+        const paysInput = document.querySelector('#adminPays, #addAnnonceModal select[name="pays"], #addAnnonceModal input[name="pays"]');
         const paysVal = paysInput ? paysInput.value.trim() : '';
         const searchQuery = paysVal ? `${query}, ${paysVal}` : query;
 

@@ -54,12 +54,22 @@ class AnnonceModel extends Model {
         }
 
         if (!empty($filters['query'])) {
-            $sql .= " AND (a.title LIKE ? OR a.location_name LIKE ? OR a.ville LIKE ? OR a.commune LIKE ? OR a.quartier LIKE ?)";
-            $params[] = "%{$filters['query']}%";
-            $params[] = "%{$filters['query']}%";
-            $params[] = "%{$filters['query']}%";
-            $params[] = "%{$filters['query']}%";
-            $params[] = "%{$filters['query']}%";
+            $rawQuery = trim($filters['query']);
+            $words = array_filter(preg_split('/\s+/', $rawQuery));
+            if (!empty($words)) {
+                foreach ($words as $word) {
+                    if (mb_strlen($word) < 1) continue;
+                    $sql .= " AND (a.title LIKE ? OR a.description LIKE ? OR a.location_name LIKE ? OR a.ville LIKE ? OR a.commune LIKE ? OR a.quartier LIKE ? OR c.name LIKE ?)";
+                    $term = "%{$word}%";
+                    $params[] = $term;
+                    $params[] = $term;
+                    $params[] = $term;
+                    $params[] = $term;
+                    $params[] = $term;
+                    $params[] = $term;
+                    $params[] = $term;
+                }
+            }
         }
 
         if (!empty($filters['pays'])) {
@@ -177,6 +187,58 @@ class AnnonceModel extends Model {
 
     public function getCategories() {
         return $this->fetchAll("SELECT * FROM categories");
+    }
+
+    public function getCategoryCounts() {
+        $sql = "SELECT c.slug, c.name, COUNT(a.id) as count 
+                FROM categories c 
+                LEFT JOIN annonces a ON a.category_id = c.id AND a.deleted_at IS NULL AND a.status != 'brouillon'
+                GROUP BY c.id, c.slug, c.name";
+        return $this->fetchAll($sql);
+    }
+
+    public function countActive() {
+        $r = $this->fetch("SELECT COUNT(*) as n FROM annonces WHERE deleted_at IS NULL AND status != 'brouillon'");
+        return (int)($r['n'] ?? 0);
+    }
+
+    public function getDistinctLocations() {
+        $sql = "SELECT DISTINCT pays, ville, commune, quartier 
+                FROM annonces 
+                WHERE deleted_at IS NULL AND status != 'brouillon'
+                ORDER BY pays ASC, ville ASC, commune ASC, quartier ASC";
+        return $this->fetchAll($sql);
+    }
+
+    public static function getPresetLocations() {
+        return [
+            'pays' => [
+                "Côte d'Ivoire", "Sénégal", "Mali", "Burkina Faso", "Guinée", 
+                "Bénin", "Togo", "Ghana", "Cameroun", "Gabon", "Congo", "RD Congo",
+                "Maroc", "Algérie", "Tunisie", "Nigeria", "Afrique du Sud", "Rwanda"
+            ],
+            'villes' => [
+                "Abidjan", "Yamoussoukro", "Bouaké", "San-Pédro", "Grand-Bassam", 
+                "Assinie", "Bonoua", "Dabou", "Jacqueville", "Korhogo", "Daloa", 
+                "Man", "Gagnoa", "Abengourou", "Divo", "Soubré"
+            ],
+            'communes' => [
+                "Cocody", "Bingerville", "Marcory", "Yopougon", "Plateau", 
+                "Port-Bouët", "Koumassi", "Treichville", "Adjamé", "Abobo", 
+                "Attécoubé", "Songon", "Anyama"
+            ],
+            'quartiers' => [
+                "Angré", "Angré 7e Tranche", "Angré 8e Tranche", "Angré 9e Tranche", "Château",
+                "Riviera 2", "Riviera 3", "Riviera 4", "Riviera Bonoumin", "Riviera Faya", "Riviera Palmeraie", "Riviera Golf",
+                "Deux Plateaux", "Deux Plateaux Vallon", "Deux Plateaux Aghien",
+                "Feh Kessé", "Bingerville Centre", "Blanchon",
+                "Zone 4", "Zone 4C", "Biétry", "Anoumabo",
+                "Maroc", "Niangon", "Selmer", "Toits Rouges",
+                "Centre des Affaires",
+                "Vridi", "Jean Folly", "Derrière Wharf", "Gonzagueville",
+                "Grand-Bassam Quartier France", "Grand-Bassam Rosiers", "Assinie Mafia"
+            ]
+        ];
     }
 
     public function delete($id) {

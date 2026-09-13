@@ -114,8 +114,8 @@
     }
     </style>
 
-    <script src="<?php echo BASE_URL; ?>/assets/js/africa-locations.js"></script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/africa-locations.js?v=<?php echo @filemtime(__DIR__ . '/../assets/js/africa-locations.js') ?: time(); ?>"></script>
     <script src="<?php echo BASE_URL; ?>/assets/js/ux-helpers.js?v=<?php echo @filemtime(__DIR__ . '/../assets/js/ux-helpers.js') ?: time(); ?>"></script>
-    <script src="<?php echo BASE_URL; ?>/assets/js/main.js"></script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/main.js?v=<?php echo @filemtime(__DIR__ . '/../assets/js/main.js') ?: time(); ?>"></script>
 </body>
 </html>
